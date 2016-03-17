@@ -1,7 +1,7 @@
 # discstoch
 Discrete stochastic kinetics for individual microbial microcolony growth curves.
 
-![Yeast growing on agar surface](http://lwlss.net/talks/uqfa/videos/MicroOriginal.mp4 "Yeast microcolonies growing on agar")
+![Yeast growing on agar surface](https://farm8.staticflickr.com/7169/6487645733_25284ce92d_z.jpg "Yeast microcolonies growing on agar")
 
 Some [slides](http://lwlss.net/talks/uqfa) about microQFA.
 
