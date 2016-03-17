@@ -11,6 +11,8 @@ Data obtained from [Levy et al. 2012] (http://www.ncbi.nlm.nih.gov/pmc/articles/
 
 A paper by [Pin and Baranyi 2006] (http://www.ncbi.nlm.nih.gov/pmc/articles/PMC1393193/) which may be of relevance to the project.
 
+####TODO
+
 - [x] Add original project proposal email text and references (separate file)
 - [x] Add links to Levy & Siegal papers
 - [ ] Draft of full project proposal
