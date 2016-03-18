@@ -1,0 +1,4 @@
+Barcode	Start.Time	Treatment	Medium	Screen	Library	Plate	RepQuad
+K000092_030_001	2011-11-15_09-47-00	30	CSM_G418	Liq_Growth_Curve	LiqCurve	1	1
+K000092_030_002	2011-11-15_09-47-00	30	CSM_G418	Liq_Growth_Curve	LiqCurve	1	2
+K000092_030_003	2011-11-15_09-47-00	30	YEPD_G418	Liq_Growth_Curve	LiqCurve	1	1

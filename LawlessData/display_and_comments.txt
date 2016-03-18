@@ -1,0 +1,10 @@
+{
+  "Channels": [{
+    "Name": "Default",
+    "Max": 251,
+    "Gamma": 1,
+    "Min": 53,
+    "Color": "java.awt.Color[r=255,g=255,b=255]"
+  }],
+  "Comments": {"Summary": ""}
+}

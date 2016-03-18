@@ -1,0 +1,1387 @@
+{
+   "VERSION": 3,
+   "ID": "Micro-Manager XY-position list",
+   "POSITIONS": [
+   {
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15654.998,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 203636.02,
+               "X": -287411.87,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R01C01",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15670.18,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 203624.663333,
+               "X": -296405.954444,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R01C02",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15685.362,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 203613.306667,
+               "X": -305400.038889,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R01C03",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15700.544,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 203601.95,
+               "X": -314394.123333,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R01C04",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15715.726,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 203590.593333,
+               "X": -323388.207778,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R01C05",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15730.908,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 203579.236667,
+               "X": -332382.292222,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R01C06",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15746.09,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 203567.88,
+               "X": -341376.376667,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R01C07",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15761.272,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 203556.523333,
+               "X": -350370.461111,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R01C08",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15776.454,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 203545.166667,
+               "X": -359364.545556,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R01C09",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15791.636,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 203533.81,
+               "X": -368358.63,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R01C10",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15816.1184,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 194776.154,
+               "X": -368438.044,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R02C10",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15799.3966222,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 194764.425111,
+               "X": -359448.148,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R02C09",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15782.6748444,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 194752.696222,
+               "X": -350458.252,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R02C08",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15765.9530667,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 194740.967333,
+               "X": -341468.356,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R02C07",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15749.2312889,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 194729.238444,
+               "X": -332478.46,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R02C06",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15732.5095111,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 194717.509556,
+               "X": -323488.564,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R02C05",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15715.7877333,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 194705.780667,
+               "X": -314498.668,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R02C04",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15699.0659556,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 194694.051778,
+               "X": -305508.772,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R02C03",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15682.3441778,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 194682.322889,
+               "X": -296518.876,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R02C02",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15665.6224,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 194670.594,
+               "X": -287528.98,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R02C01",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15676.2468,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 185705.168,
+               "X": -287646.09,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R03C01",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15694.5083556,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 185739.982444,
+               "X": -296631.797556,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R03C02",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15712.7699111,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 185774.796889,
+               "X": -305617.505111,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R03C03",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15731.0314667,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 185809.611333,
+               "X": -314603.212667,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R03C04",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15749.2930222,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 185844.425778,
+               "X": -323588.920222,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R03C05",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15767.5545778,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 185879.240222,
+               "X": -332574.627778,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R03C06",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15785.8161333,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 185914.054667,
+               "X": -341560.335333,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R03C07",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15804.0776889,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 185948.869111,
+               "X": -350546.042889,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R03C08",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15822.3392444,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 185983.683556,
+               "X": -359531.750444,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R03C09",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15840.6008,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 186018.498,
+               "X": -368517.458,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R03C10",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15865.0832,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 177260.842,
+               "X": -368596.872,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R04C10",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15845.2818667,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 177202.942,
+               "X": -359615.352889,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R04C09",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15825.4805333,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 177145.042,
+               "X": -350633.833778,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R04C08",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15805.6792,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 177087.142,
+               "X": -341652.314667,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R04C07",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15785.8778667,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 177029.242,
+               "X": -332670.795556,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R04C06",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15766.0765333,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 176971.342,
+               "X": -323689.276444,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R04C05",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15746.2752,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 176913.442,
+               "X": -314707.757333,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R04C04",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15726.4738667,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 176855.542,
+               "X": -305726.238222,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R04C03",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15706.6725333,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 176797.642,
+               "X": -296744.719111,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R04C02",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15686.8712,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 176739.742,
+               "X": -287763.2,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R04C01",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15697.4956,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 167774.316,
+               "X": -287880.31,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R05C01",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15718.8367111,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 167855.301556,
+               "X": -296857.640667,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R05C02",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15740.1778222,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 167936.287111,
+               "X": -305834.971333,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R05C03",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15761.5189333,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 168017.272667,
+               "X": -314812.302,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R05C04",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15782.8600444,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 168098.258222,
+               "X": -323789.632667,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R05C05",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15804.2011556,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 168179.243778,
+               "X": -332766.963333,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R05C06",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15825.5422667,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 168260.229333,
+               "X": -341744.294,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R05C07",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15846.8833778,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 168341.214889,
+               "X": -350721.624667,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R05C08",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15868.2244889,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 168422.200444,
+               "X": -359698.955333,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R05C09",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15889.5656,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 168503.186,
+               "X": -368676.286,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R05C10",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15914.048,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 159745.53,
+               "X": -368755.7,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R06C10",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15891.1671111,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 159641.458889,
+               "X": -359782.557778,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R06C09",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15868.2862222,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 159537.387778,
+               "X": -350809.415556,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R06C08",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15845.4053333,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 159433.316667,
+               "X": -341836.273333,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R06C07",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15822.5244444,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 159329.245556,
+               "X": -332863.131111,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R06C06",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15799.6435556,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 159225.174444,
+               "X": -323889.988889,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R06C05",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15776.7626667,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 159121.103333,
+               "X": -314916.846667,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R06C04",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15753.8817778,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 159017.032222,
+               "X": -305943.704444,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R06C03",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15731.0008889,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 158912.961111,
+               "X": -296970.562222,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R06C02",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },{
+         "GRID_COL": 0,
+         "DEVICES": [
+            {
+               "DEVICE": "ZStage",
+               "AXES": 1,
+               "Y": 0,
+               "X": -15708.12,
+               "Z": 0
+            },
+            {
+               "DEVICE": "XYStage",
+               "AXES": 2,
+               "Y": 158808.89,
+               "X": -287997.42,
+               "Z": 0
+            }
+         ],
+         "PROPERTIES": {},
+         "DEFAULT_Z_STAGE": "ZStage",
+         "LABEL": "R06C01",
+         "GRID_ROW": 0,
+         "DEFAULT_XY_STAGE": "XYStage"
+      },
+]
+}
