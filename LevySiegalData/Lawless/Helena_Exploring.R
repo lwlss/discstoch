@@ -1,6 +1,8 @@
 #Exploring the Data by Levy et al. 2012 
 #setwd("~/GitHub/discstoch/LevySiegalData/Lawless")
 
+library(grDevices)
+
 load("d.110601.Rfile") #rep1
 rep1=d
 load("d.110612.Rfile") #rep3
@@ -44,34 +46,43 @@ strain_wells=names(conditions[which(conditions==condition_names[[10]])])
 #focusing on one well for now
 w=rep$well.list[[strain_wells[1]]]
 area=rep$areas[w,]
-time=rep$times[w,]
+time=as.numeric(rep$times[w[1],]) # Assume that all timepoints for one well are the same
 
-#converting area to logs and getting rid of -Inf values 
+# Convert zero observations to NaN (Not a Number)
+area[area==0]=NA
+
+#converting area to logs 
 l_area=log(area)
-l_area[which(l_area<0)]<-0
+
+# Too many growth curves to see clearly
+Nsample=20
 
 output=par(mfrow=c(2,1))
 #Plotting growth curves for clonal population
-plot(1, type='n', xlim=c(0,max(time)), ylim=c(0,max(l_area)), xlab="Time (h)", ylab="Area (px)", 
+plot(NULL, xlim=c(0,max(time)), ylim=range(area,na.rm=TRUE), xlab="Time (h)", ylab="Area (px)", log="y",
      main=paste("Log-Linear Growth Curves for Replicate 4 , Strain", condition_names[[10]], ", Well", strain_wells[1]))
-for (i in 1:dim(time)[1])
+for (i in sample(1:dim(area)[1],Nsample,replace=FALSE))
 {
-  lines(time[i,],l_area[i,])
+  # Try transparency to see pattern in hundreds of growth curves
+  lines(time,area[i,],col=rgb(0,0,0,0.3),lwd=2)
 }
 
 #looking at the entire strain within that replicate
-plot(2, type='n', xlim=c(0,max(time)), ylim=c(0,10), xlab="Time (h)", ylab="Area (px)", 
+plot(NULL, xlim=c(0,max(time)), ylim=range(area,na.rm=TRUE), xlab="Time (h)", ylab="Area (px)", log="y",
      main=paste("Log-Linear Growth Curves for Replicate 4 , Strain", condition_names[[10]]))
-for (k in 1:length(strain_wells))
+rect(par("usr")[1],par("usr")[3],par("usr")[2],2*max(area,na.rm=TRUE),col = "lightgrey")
+Nstrain_wells=length(strain_wells)
+cols=adjustcolor(rainbow(Nstrain_wells),0.1)
+for (k in 1:Nstrain_wells)
 {
   w=rep$well.list[[strain_wells[k]]]
   area=rep$areas[w,]
-  time=rep$times[w,]
+  time=as.numeric(rep$times[w[1],])
+  area[area==0]=NA
   l_area=log(area)
-  l_area[which(l_area<0)]<-0
-  for (i in 1:dim(time)[1])
+  for (i in sample(1:dim(area)[1],Nsample,replace=FALSE))
   {
-    lines(time[i,],l_area[i,])
+    lines(time,area[i,],lwd=2,col=cols[k])
   }
 }
 par(output)
