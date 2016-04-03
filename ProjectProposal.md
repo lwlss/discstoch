@@ -54,47 +54,71 @@ Involves Transient Metal Accumulation.] (http://dx.doi.org/10.1128/JB.06112-11)
 
 #Aims and Objectives
 
+The majority of experimental techniques are not of sufficiently high resolution to examine the behaviour of individual cells.  To get around this, (micro-)biologists design experiments to examine pure, isogenic, clonal cell cultures instead.  Clonal cultures are lineages derived from a single cell.  By examining purified cell populations in order to learn about the behaviour of single cells, we assume that all members of such populations behave in the same way.  However, there is increasing evidence that there is considerable heterogeneity between members of isogenic cell populations.
+
+In this project, we will develop models to capture observable levels of  growth rate heterogeneity in isogenic microbial cultures.  We will use these models to explore how intracellular variability can affect our interpretation of population growth rate observations.  In particular we will examine evidence for lag phase in microbial growth curves.
+
+Data analyses and model exploration will be based on three available data set: (i) uQFA data produced by Lawless (and possiblible repeat of the experiment) (ii) Levy et al. 2012 and (iii) Ziv et al. 2013. All data sets are based on Saccharomyces cerevisiae growth. 
+
 ##Aims
 
-1.	Find a model which best captures heterogeneity in microbial growth curves that allows for a distinction between single cell stochasticities and population heterogeneity. This is based on the notion that isogenic cell growth exhibits intrinsic stochasticities which may drown in the noise of extrinsic heterogeneities when considering population dynamics. Addressing the effect of isogenic variation on population dynamics may yield further mechanistic insight for analysing population growth curves. 
-2.	Explore the implications which a stochastic model may have on the interpretation of a lag phase.  With the lag phase, thus far, being the least explored growth phase biologically and mathematically, a modelled distinction between isogenic single cell variation and population variation is likely to lead to new insights and mechanistic interpreations. It is suspected that when taking cell growth and division time into account, the lag phase may actually be a mere artefact of a wide growth rate distribution within the population; μQFA video data obtained by Lawless provides little evidence for a lag phase at first sight.
+######1. 	If possible, repeat the uQFA experiments with the aim of obtaining higher resolution data (depending on resource and time availability)
+
+This will involve undertaking microscopic obervations of clonal *S. cerevisiae* cells to capture the lag and exponential phase of growth in great detail. Image analysis tools will be required for generating growth curves from the data.
+
+######2.	Find a model which best captures heterogeneity in microbial growth curves that allows for a distinction between ineherent lineage stochasticities and population heterogeneity. 
+
+This is based on the notion that isogenic cell growth exhibits intrinsic stochasticities which may drown in the noise of extrinsic heterogeneities when considering population dynamics. Addressing the effect of isogenic variation on population dynamics may yield further mechanistic insight for analysing population growth curves. 
+
+######3.	Explore the implications which a stochastic model may have on the interpretation of various growth phases with a particular emphasis on the lag phase.  
+
+With the lag phase, thus far, being the least explored growth phase biologically and mathematically, a modelled distinction between isogenic single lineage variation and population variation is likely to lead to new insights and mechanistic interpreations. It is suspected that when taking cell growth and division time into account, the lag phase may actually be a mere artefact of a wide growth rate distribution within the population; μQFA video data obtained by Lawless provides little evidence for a lag phase at first sight. Also, microbiologists often sample cell populations during the exponential phase in order to obtain better results. It is thus worth analysing how apparent population heterogeneity affects sampling from different phases.
 
 ## Objectives
 
 1.	Preparation and Data Exploration 
-    1. Ensure data accessibility by converting data sets into a general format which can be accessed using R and Python
-    2. Write scripts to extract growth curves from each of the data sets. Look at pulling out single growth curves and pulling out all growth curves for a single spot or genotype. 
-    3. Use calibration curves to convert area vs time curves to cell count vs time curves 
-    4. **Write up: Stage 1 – Introduction and Background Reading (reuse project proposal)**
+    1. Image analysis and experimentation; try and obtain uQFA data with higher resolution. 
+    2. Ensure data accessibility by converting data sets into a general format which can be accessed using R and Python.
+    3. Write scripts to extract growth curves from each of the data sets. Look at pulling out single growth curves and pulling out all growth curves for a single spot or genotype. 
+    4. Use calibration curves to convert area vs time curves to cell count vs time curves.
+
+######Write up: Stage 1 – Introduction and Background Reading (reuse project proposal). Generate plots to visualise the raw data for why the impact of hetergoneity is being researched.
+
 2.	Model Development 
     1. Develop parameter inference workflows to learn about microbial growth rates. 
-    2. Apply a deterministic model to the data. 
-    3. Apply a stochastic birth-only model to the data. 
-    4. Apply a hybrid model to the data to find a potential trade-off between speed and accuracy.  Can a sensible cut-off for model switching be determined? 
-    5. **Write up: Stage 2 – Model Development**
-3.	Model Exploration and Refinement 
+    2. Fit a deterministic model to ~20 isogenic growth curves for each data set. 
+    3. Fit a stochastic birth-only model to ~20 isogenic growth curves for each data set. 
+    4. Fit a hybrid model to ~20 isogenic growth curves for each data set to find a potential trade-off between speed and accuracy. Can a sensible cut-off for model switching be determined? 
+    6. Can we improve the models by adding more biological information? Consider using the time required for cell growth and division as a lower bound for time sampling in the algorithm of the stochastic model. Potentially consider more complicated models which include some kind of death, or alternatively a switch to a non-dividing state, while maintaining monotonic increasing growth curves.  Is there a low rate of death which can still give increasing curves? *If so a new project title would be in order*
+    7. Package and document the models. 
+
+######Write up: Stage 2 - Model development. State model assumptions, implications, and validity. Analyse how these model fits differ and why. generate plots to demonstrate the accuracy of each of the developed models. State each of the required parameters and the biological significance of the parameters in the context of the model.
+
+3.	Analyzing model Fit
     1. Which model seems to exhibit the closet fit to the data. 
-    2. Compare model fit using MLE point estimates or Bayes factor. Meta-priors may prove useful for hierarchical, numerical integration of all three data sets. 
-    3. Analyse how these model fits differ and why. State each of the required parameters and the biological significance of the parameters in the context of the model. Can we improve this fit by adding more biological information? 
-    4. Consider using the time required for cell growth and division as a lower bound for time sampling in the algorithm of the stochastic model and repeat steps 3.ii and 3.iii. 
-    5. **Write up: Stage 3 – Model Exploration and Validity** 
+    2. Compare model fit using Bayes factor. Bayes factor naturally penalizes for over-fitting. Meta-priors may prove useful for hierarchical, numerical integration of all three data sets. 
+
+######Write up: Stage 3 – Model Exploration and Validity
+
 4.	Exploring the Mechanistic Implications 
     1. Explore heterogeneity in the data; analyse the growth rate distribution. 
     2. How much of the apparent heterogeneity in growth rate is reduced when considering stochasticity?
     3. Does a lag phase *per se* even exist within the data or can this be explained by heterogeneity?
-    4. **Write up: Stage 4 – Mechanistic implications on lag phase**
-5.	Model Accessibility and Reuse
-    1. Package and document the finalized models.
-    2. State model assumptions, implications, and validity. 
-    3. **Write up: Stage 5 – Discussion + putting it all together; final Dissertation for submission on August 26th**
+    4. See how apparent population heterogeneity might be affected by sampling from different phases.
+
+######Write up: Stage 4 – Mechanistic implications on lag phase. Include figures that emphasize each of the concluded implications.
+
+5.	Putting it all together 
+
+######Write up: Stage 5 – Discussion + putting it all together; final Dissertation for submission on August 26th
 
 ####Rough TimeLine
 
 - April 18th – April 29th (2 weeks): **Stage 1**
-- May 2nd – May 27th (4 weeks): **Stage 2**
-- May 30th – July 1st (5 weeks): **Stage 3**
-- July 4th – July 8th (1 week): Catch-up/ Holiday
-- July 11th – August 12th (5 weeks): **Stage 4**
-- August 15th – August 26th (2 weeks): **Stage 5** 
+- May 2nd – June 10th (6 weeks): **Stage 2**
+- June 13th – July 8th (4 weeks): **Stage 3**
+- July 11th – July 15th (1 week): Catch-up/ Holiday
+- July 18th – July 29th (2 weeks): **Stage 4**
+- August 1st – August 26th (4 weeks): **Stage 5** 
 
 
