@@ -1,6 +1,8 @@
 #Exploring the data by Ziv et al. 2013
 #setwd("~/GitHub/discstoch/LevySiegalData/LWOdata")
 
+library(grDevices)
+
 data=read.table("LWOdata.txt", header=TRUE)
 area=read.table("LWOarea.txt", header=TRUE)
 
@@ -30,27 +32,37 @@ for (i in 1:length(strains))
 
 #Overlayed growth curves
 
+#Convert zero observations to NaN (Not a Number)
+area[area==0]=NA
+
+# Too many growth curves to see clearly
+Nsample=20
+
 pdf(height = 16, width = 16, file = "ClonalGrowthCurves.pdf")
 par(mfrow=c(3,3))
 
 for(j in 1:length(wells))
 {
   indices=which(data$well == wells[j])
-  l_area=as.matrix(log(area[indices,]))
-  l_area[which(l_area<0)]<-0 
+  j_area=as.matrix(area[indices,])
+  
+  #cannot take sample larger than the population when replace=FALSE
+  if (dim(j_area)[1] < Nsample) {
+    Nsample=dim(j_area)[1]
+  }
   
   #finding the associated strain and plate
   w_data=subset(data,well==wells[j], select=c(Strain,plate))
-  paint=c("black","darkblue","darkred","darkgreen")
+  paint=c(rgb(0,0,0,0.3),rgb(0,0,1,0.3),rgb(1,0,0,0.3),rgb(0,1,0,0.3))
   
   #plotting clonal growth curves so that line colour indicates strain
   #black: FY4-5; blue: OakBC248; red: WineBC241; green: HybBC252
-  plot(j,type='n',xlim=c(0,dim(l_area)[2]), ylim=c(0,max(l_area)), xlab="Time (h)", ylab="Area (px)",
+  plot(j,type='n',xlim=c(0,dim(j_area)[2]), ylim=range(j_area,na.rm=TRUE), xlab="Time (h)", ylab="Area (px)", log="y",
        main=paste("Log-linear Growth Curves"), cex.main=2, cex.lab=1.5, cex.axis=1.5)
   
-  for (i in 1:dim(l_area)[1])
+  for (i in sample(1:dim(j_area)[1],Nsample,replace=FALSE))
   {
-    lines(l_area[i,], col=paint[which(strains==unique(w_data$Strain))])
+    lines(j_area[i,], col=paint[which(strains==unique(w_data$Strain))])
   }
   #putting associated well and plate number in the legend
   legend("topleft",legend=c(wells[j],unique(w_data$plate)),cex=1.5)
@@ -58,5 +70,4 @@ for(j in 1:length(wells))
 }
 
 dev.off()
-
 
