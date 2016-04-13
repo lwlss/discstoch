@@ -1,3 +1,5 @@
+
+
 # Convert microQFA pinid to QFA pinid (plate is upside down)
 pinid=function(pid){
 	Col=as.numeric(substr(pid,5,6))
@@ -51,8 +53,8 @@ plotStuff=function(fname){
 			# Fit exponential model
 			result=nls(y~A+r*x,data=data.frame(x=tim,y=log(dat)),start=list(A=log(inocguess),r=0.1))
 			res=result$m$getPars()
-			A=exp(as.real(res[1]))
-			r=max(0,as.real(res[2]))
+			A=exp(as.numeric(res[1]))
+			r=max(0,as.numeric(res[2]))
 		}else{A=1;r=0}
 		AList=c(AList,A)
 		rList=c(rList,r)
@@ -105,8 +107,8 @@ plotBoth=function(fnameA,fnameB){
 			# Fit exponential model
 			result=nls(y~A+r*x,data=data.frame(x=timA,y=log(dat)),start=list(A=log(inocguess),r=0.1))
 			res=result$m$getPars()
-			A=exp(as.real(res[1]))
-			r=max(0,as.real(res[2]))
+			A=exp(as.numeric(res[1]))
+			r=max(0,as.numeric(res[2]))
 		}else{A=1;r=0}
 		rListA=c(rListA,r)
 		lines(timA,dat,type="l",lwd=1,col=tcol[1])
@@ -121,8 +123,8 @@ plotBoth=function(fnameA,fnameB){
 			# Fit exponential model
 			result=nls(y~A+r*x,data=data.frame(x=timB,y=log(dat)),start=list(A=log(inocguess),r=0.1))
 			res=result$m$getPars()
-			A=exp(as.real(res[1]))
-			r=max(0,as.real(res[2]))
+			A=exp(as.numeric(res[1]))
+			r=max(0,as.numeric(res[2]))
 		}else{A=1;r=0}
 		rListB=c(rListB,r)
 		lines(timB,dat,type="l",lwd=1,col=tcol[4])
@@ -142,11 +144,7 @@ plotBoth=function(fnameA,fnameB){
 	return(wilcox.test(rListA,rListB))
 }
 
-pdf("ColourVersion.pdf",width=10,height=5)
-plotBoth(flist[29],flist[31])
-dev.off()
 
-getORF=makeORFGetter("AUXILIARY\\LibraryDescription.txt")
 
 # Fit exponential model to all microcolonies
 flist=list.files(pattern="*_OUT.txt")
@@ -156,6 +154,12 @@ for (f in flist[2:length(flist)]){
 	dat=rbind(dat,params)
 }
 dat$Gene=substr(dat$Strain,1,4)
+
+pdf("ColourVersion.pdf",width=10,height=5)
+plotBoth(flist[29],flist[31])
+dev.off()
+
+getORF=makeORFGetter("AUXILIARY\\LibraryDescription.txt")
 
 svg("CompareAllMicrocolonies.pdf")
 
