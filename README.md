@@ -15,6 +15,6 @@ A paper by [Pin and Baranyi 2006] (http://www.ncbi.nlm.nih.gov/pmc/articles/PMC1
 
 - [x] Add original project proposal email text and references (separate file)
 - [x] Add links to Levy & Siegal papers
-- [ ] Draft of full project proposal
+- [x] Draft of full project proposal
 - [ ] Add Python and R code for discrete stochastic model
-- [ ] Parse data and write Python/R functions to extract individual growth curves
+- [x] Parse data and write Python/R functions to extract individual growth curves
