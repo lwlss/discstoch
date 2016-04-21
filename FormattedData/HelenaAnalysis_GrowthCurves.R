@@ -1,16 +1,11 @@
 # Extracting Growth Cruves from the Formatted Data Sets: Lawless, Levy & Ziv 
 
-# setwd("~/discstoch-master/FormattedData")
-
 #####################Functions############################
 
 # Choosing a data set to work with
 dataset<-function(x){
-  print(c("Lawless","Levy","Ziv"))
-  x=readline(prompt="Which dataset? ")
   if (x == "Lawless"){
     # DataSet1: Lawless
-    print("Loading dataset...")
     area=read.table("Lawless_area.txt",header=FALSE)
     times=read.table("Lawless_time.txt",header=FALSE)
     data=read.table("Lawless_data.txt",header=FALSE) #3rd column (Identifier) => strain_parentcolony 
@@ -18,7 +13,6 @@ dataset<-function(x){
   }
   else if (x == "Levy"){
     # DataSet2: Levy
-    print("Loading dataset...")
     area=read.table("Levy_area.txt",header=FALSE)
     times=read.table("Levy_time.txt",header=FALSE)
     data=read.table("Levy_data.txt",header=FALSE) #3rd column (Identifier) => replicate
@@ -26,122 +20,58 @@ dataset<-function(x){
   }
   else if (x == "Ziv"){
     # DataSet3: Ziv
-    print("Loading dataset...")
     area=read.table("Ziv_area.txt",header=FALSE)
     times=read.table("Ziv_time.txt",header=FALSE)
     data=read.table("Ziv_data.txt",header=FALSE) #3rd column (Identifier) => colony
     return(list("area"=area,"data"=data,"times"=times))
   }
-  else {print("Not a valid dataset. Retry..."); dataset()}
+  else {print("Not a valid dataset")}
 }
 
 # Subsetting the data according to strain (genotype)
-subset_strain<-function(d,a,t){ 
-  #where d is the formatted data;
-  #a and t are the respective area and time 
-  strain_names=unique(d$genotype)
-  print(strain_names)
-  strain=readline(prompt="Extract data for strain: ")
-  if(length(intersect(strain,strain_names))!=1){
-    print("Invalids strain name. Retry...")
-    subset_strain(d,a,t)
-  }
-  else{
-    s_name=toString(strain)
-    indices=which(d$genotype == strain)
-    s_area=a[indices,]; s_times=t[indices,]; s_data=d[indices,]
-    return(list("area"=s_area,"times"=s_times,"data"=s_data, "name"=s_name))
-  }
+subset_strain<-function(d,a,t,strain){ 
+  s_name=toString(strain)
+  indices=which(d$genotype == strain)
+  s_area=a[indices,]; s_times=t[indices,]; s_data=d[indices,]
+  return(list("area"=s_area,"times"=s_times,"data"=s_data, "name"=s_name))
 }
 
 # Subsetting the data according to an identifier 
-subset_identifier<-function(d,a,t){
-  #where d is the formatted data;
-  #a and t are the respective area and time 
-  identifier_names=unique(d$identifier)
-  print(identifier_names)
-  identifier=readline(prompt="Extract data for identifier: ")
-  if(length(intersect(identifier,identifier_names))!=1){
-    print("Invalid identifier. Retry...")
-    subset_identifier(d,a,t)
-  }
-  else{
-    i_name=toString(identifier)
-    indices=which(d$identifier == identifier)
-    i_area=a[indices,]; i_times=t[indices,]; i_data=d[indices,]
-    return(list("area"=i_area,"times"=i_times,"data"=i_data, "name"=i_name))
-  }
+subset_identifier<-function(d,a,t,identifier){
+  i_name=toString(identifier)
+  indices=which(d$identifier == identifier)
+  i_area=a[indices,]; i_times=t[indices,]; i_data=d[indices,]
+  return(list("area"=i_area,"times"=i_times,"data"=i_data, "name"=i_name))
 }
 
 # Subsetting the data according to a clonal colony
-subset_colony<-function(d,a,t){
-  #where d is the formatted data;
-  #a and t are the respective area and time 
-  colony_names=unique(d$clonalcolony)
-  print(colony_names)
-  colony=readline(prompt="Extract data for clonal colony: ")
-  if(length(intersect(colony,colony_names))!=1){
-    print("Invalid clonal colony. Retry...")
-    subset_colony(d,a,t)
-  }
-  else{
-    c_name=toString(colony)
-    indices=which(d$clonalcolony == colony)
-    c_area=a[indices,]; c_times=t[indices,]; c_data=d[indices,]
-    return(list("area"=c_area,"times"=c_times,"data"=c_data, "name"=c_name)) 
-  }
+subset_colony<-function(d,a,t,colony){
+  c_name=toString(colony)
+  indices=which(d$clonalcolony == colony)
+  c_area=a[indices,]; c_times=t[indices,]; c_data=d[indices,]
+  return(list("area"=c_area,"times"=c_times,"data"=c_data, "name"=c_name))
 }
 
 # Subsetting the data according to a specific clonal colony, identifier and/ or genotype 
-subset_3vars<-function(d,a,t){
-  #where d is the formatted data;
-  #a and t are the respective area and time;
-  gnames=unique(d$genotype)
-  print(gnames)
-  gen=readline(prompt="Which genotype? (Or enter 'total'.) ")
-  if (length(intersect(gnames,gen))!=1 & length(intersect(gen,"total"))!=1){
-    print("Invalid genotype. Retry...")
-    subset_3vars(d,a,t)
+subset_3vars<-function(d,a,t,gen=total,cc=total,id=total){
+  if (gen == "total"){
+    indices1=seq(1:dim(a)[1])
+  }else{indices1=which(d$genotype == gen)}
+  if (cc == "total"){
+    indices2=seq(1:dim(a)[1])
+  }else{indices2=which(d$clonalcolony == cc)}
+  if (id == "total"){
+    indices3=seq(1:dim(a)[1])
+  }else{indices3=which(d$identifier == id)}
+  indices=intersect(indices1,indices2)
+  indices=intersect(indices,indices3)
+  if (length(indices) == 0){
+    print("Input Error: Invalid combination")
   }
   else{
-    cnames=unique(d$clonalcolony)
-    print(cnames)
-    cc=readline(prompt="Which clonal colony? (Or enter 'total'.) ")
-    if (length(intersect(cnames,cc))!=1 & length(intersect(cc,"total"))!=1){
-      print("Invalid clonal colony Retry...")
-      subset_3vars(d,a,t)
-    }
-    else{
-      inames=unique(d$identifier)
-      print(inames)
-      id=readline(prompt="Which identifier? (Or enter 'total'.) ")
-      if (length(intersect(inames,id))!=1 & length(intersect(id,"total"))!=1){
-        print("Invalid clonal colony Retry...")
-        subset_3vars(d,a,t)
-      }
-      else{
-        #gen, cc, and id are the genotype, clonalcolony, and id respectively
-        if (gen == "total"){
-          indices1=seq(1:dim(a)[1])
-        }else{indices1=which(d$genotype == gen)}
-        if (cc == "total"){
-          indices2=seq(1:dim(a)[1])
-        }else{indices2=which(d$clonalcolony == cc)}
-        if (id == "total"){
-          indices3=seq(1:dim(a)[1])
-        }else{indices3=which(d$identifier == id)}
-        indices=intersect(indices1,indices2)
-        indices=intersect(indices,indices3)
-        if (length(indices) == 0){
-          print("Input Error: Invalid combination")
-        }
-        else{
-          f_name=paste("Genotype: ", toString(gen), " Colony: ", toString(cc), " Identifier: ", toString(id))
-          f_area=a[indices,]; f_times=t[indices,]; f_data=d[indices,]
-          return(list("area"=f_area,"times"=f_times,"data"=f_data, "name"=f_name))
-        }
-      }
-    }
+    f_name=paste("Genotype: ", toString(gen), " Colony: ", toString(cc), " Identifier: ", toString(id))
+    f_area=a[indices,]; f_times=t[indices,]; f_data=d[indices,]
+    return(list("area"=f_area,"times"=f_times,"data"=f_data, "name"=f_name))
   }
 }
 
@@ -161,27 +91,49 @@ hist_cells<-function(dat,int){
 }
 
 # Plotting growth curve
-plot_growth<-function(a,t,s,Nsample=100){ 
+plot_growth<-function(a,t,s,Nsample=100,plot=TRUE){ 
   if (dim(a)[1] < Nsample) {Nsample=dim(a)[1]} #cannot take sample larger than the population when replace=F
   #where area (a), times (t) and name (s) are required as input variables
   indices=sample(1:dim(a)[1],Nsample,replace=FALSE)
-  op=par(mfrow=c(2,1))
-  plot(1,type='n', xlim=range(t[indices,],na.rm=TRUE), ylim=range(a[indices,],na.rm=TRUE),xlab="Time (h)", 
-       ylab="Microcolony Area (px)",main=paste(s),cex.lab=1.2)
   k=c()
-  for (i in indices){
-    lines(as.numeric(t[i,]),as.numeric(a[i,]),col=rgb(0.3,0.3,0.3,0.3),lwd=2)
+  if(plot==TRUE){
+    op=par(mfrow=c(2,1))
+    plot(1,type='n', xlim=range(t[indices,],na.rm=TRUE), ylim=range(a[indices,],na.rm=TRUE),xlab="Time (h)", 
+         ylab="Microcolony Area (px)",main=paste(s),cex.lab=1.2)
+    for (i in indices){
+      lines(as.numeric(t[i,]),as.numeric(a[i,]),col=rgb(0.3,0.3,0.3,0.3),lwd=2)
+      rate=LM_growthrate(as.numeric(area[i,]),as.numeric(times[i,]))
+      k=c(k,rate)
+    }
+    #Growth rate Distribution
+    #k=k[k>=0 & k<=0.5]
+    #lo=0
+    #hi=0.5
+    # cells=seq(lo,hi,0.01)
+    cells=hist_cells(k,0.01)
+    hist(k,breaks=cells,xlab="r (1/h)", main=paste(Nsample," microcolonies"),cex.lab=1.2)
+    par(op)
+  }
+  else {
+    for (i in indices){
+      rate=LM_growthrate(as.numeric(area[i,]),as.numeric(times[i,]))
+      k=c(k,rate)
+    }
+  }
+  return(list("rates"=k,"ind"=indices))
+}
+
+# Histogram only
+histo<-function(a,t,s){
+  k=c()
+  for (i in 1:dim(a)[1]){
     rate=LM_growthrate(as.numeric(area[i,]),as.numeric(times[i,]))
     k=c(k,rate)
+    op=par(mfrow=c(1,1))
+    cells=hist_cells(k,0.05)
+    hist(k,breaks=cells,xlab="r (1/h)", main=paste(s),cex.lab=1.4, cex.main=1.2,col="lightblue")
+    par(op)
   }
-  #Growth rate Distribution
-  #k=k[k>=0 & k<=0.5]
-  #lo=0
-  #hi=0.5
-  # cells=seq(lo,hi,0.01)
-  cells=hist_cells(k,0.01)
-  hist(k,breaks=cells,xlab="r (1/h)", main=paste(Nsample," microcolonies"),cex.lab=1.2)
-  par(op)
 }
 
 # Plotting growth curves (colour-coding the identifiers)
@@ -191,7 +143,7 @@ plot_growth_colour<-function(a,t,d,s,Nsample=100){
   indices=sample(1:dim(a)[1],Nsample,replace=FALSE)
   ids=d$identifier[indices]
   id_names=unique(ids)
-  cols=adjustcolor(rainbow(length(id_names)),0.5)
+  cols=adjustcolor(rainbow(length(id_names)),0.3)
   op=par(mfrow=c(2,1))
   plot(1,type='n', xlim=range(t[indices,],na.rm=TRUE), ylim=range(a[indices,],na.rm=TRUE),xlab="Time (h)", 
        ylab="Microcolony Area (px)",main=paste(s),cex.lab=1.2)
@@ -202,7 +154,7 @@ plot_growth_colour<-function(a,t,d,s,Nsample=100){
     rate=LM_growthrate(as.numeric(area[i,]),as.numeric(times[i,]))
     k=c(k,rate)
   }
-  legend("topleft",legend=id_names,pch=15,col=cols,horiz=TRUE)
+  legend("topleft",legend=id_names,pch=15,col=cols)
   #Growth rate Distribution
   cells=hist_cells(k,0.01)
   hist(k,breaks=cells,xlab="r (1/h)",main=paste(Nsample," microcolonies"),cex.lab=1.2)
@@ -236,7 +188,7 @@ plot_growth_overlay<-function(al,tl,sl,Nsample=100){
   plot(1,type='n', xlim=c(list_range(tl)$mi,list_range(tl)$ma), ylim=c(0,max(maxval)),xlab="Time (h)",
        ylab="Microcolony Area (px)",main="Overlaid Growth Curves",cex.lab=1.2)
   rect(par("usr")[1],par("usr")[3],par("usr")[2],2*max(area,na.rm=TRUE),col = "lightgrey")
-  cols=adjustcolor(rainbow(length(al)),0.5)
+  cols=adjustcolor(rainbow(length(al)),0.3)
   rates=list()
   names=c()
   histcounts=c()
@@ -268,48 +220,118 @@ plot_growth_overlay<-function(al,tl,sl,Nsample=100){
   par(op)
 }
 
+# Simulating exponential growth  
+simExponential<-function(r,t,N0=1){
+  N=N0*exp(r*t)
+  return(N)
+}
 
+#Function to plot a single estimated population growth curve
+single_pop_plot<-function(Narea,Ntime,title,log=TRUE){
+  if (log == TRUE){
+    plot(Ntime,Narea,main=title,log="y",xlab="Time",ylab="log(Area)",cex.lab=1.4,cex.main=1.2)
+  }
+  else{
+    plot(Ntime,Narea,main=title,xlab="Time ",ylab="Area",cex.lab=1.4,cex.main=1.2)
+  }
+}
+
+# Simulating multiple population growth curves 
+pop_sim_dat<-function(strain,N,t,it){
+  #where s is a single strain name, N is the sample size, 
+  #and it is the number of iterations
+  PopData=matrix(0,nrow=it,ncol=length(t))
+  for (i in 1:it){
+    truevals=plot_growth(strain$area,strain$times,strain$name,Nsample=N,plot=FALSE)
+    rates=truevals$rates
+    expdata=strain$area[truevals$ind,]
+    exptime=strain$times[truevals$ind,]
+    simdata=matrix(0,nrow=length(rates),ncol=length(t))
+    for (k in 1:length(rates)){
+      simdata[k,]=simExponential(rates[k],t)
+    }
+    Npop_sim=colSums(simdata)
+    PopData[i,]=Npop_sim
+  }
+  return(PopData)
+}
+
+# Plotting multiple population growth curves
+pop_plot<-function(a,t){ 
+  op=par(mfrow=c(1,1))
+  plot(1,type='n', xlim=range(t), ylim=range(a),xlab="Time", 
+       ylab="log(Area)",main="Population Simulations",cex.lab=1.4,cex.main=1.2,log='y')
+  k=c()
+  for (i in 1:dim(a)[1]){
+    lines(t,a[i,],col=rgb(0.3,0.3,0.3,0.3),lwd=2)
+    rate=LM_growthrate(a[i,],t)
+    k=c(k,rate)
+  }
+  par(op)
+  return(k)
+}
 
 #####################Main############################
 
-# Choosing a Data set
-x=dataset()
+# Choosing a data set 
+x=dataset("Lawless")
 area=x$area
 times=x$times
 data=x$data
-# All formated *_data.txt files should be in the form: Genotype, Clonal Colony (well), Identifier 
-# NB: No headers on any of the files.
 colnames(data)=c("genotype","clonalcolony","identifier")
-# Getting rid of zero areas
-# NB in Lawless's data zero's were converted to ones... 
 area[area==0]=NA
 
-# Extracting data for one strain 
-strain=subset_strain(data,area,times)
-# Plotting growth curves for that strain
-plot_growth(strain$area,strain$times,strain$name, Nsample=50)
-plot_growth_colour(strain$area,strain$times,strain$data,strain$name,Nsample=5)
+strain_names=unique(data$genotype)
+pickstrain=strain_names[2] #choose strain here!
+strain=subset_strain(data,area,times,pickstrain) 
+total=length(which(data$genotype==pickstrain))
+N=round(total*0.2)#using 20% of the total data for extrapolation
+time=seq(0,35,0.5)
 
-# Extracting data for one identifier 
-identifier=subset_identifier(data,area,times)
-# Plotting growth curves for that identifier
-plot_growth(identifier$area,identifier$times,identifier$name, Nsample=50)
+# Refitting the exponential model to the newly simulated data to obtain r_p
+data=pop_sim_dat(strain,N,time,20)
+pop_rates=pop_plot(data,time)
+mean(pop_rates); sd(pop_rates)
 
-# Extracting data for one clonal colony
-clonalcolony=subset_colony(data,area,times)
-# Plotting growth curves for that clonal colony
-plot_growth(clonalcolony$area,clonalcolony$times,clonalcolony$name)
+histo(strain$area,strain$times,pickstrain)
+abline(v=mean(pop_rates),col="blue",lwd=2)
+abline(v=(mean(pop_rates)-sd(pop_rates)),col="blue",lty=2)
+abline(v=(mean(pop_rates)+sd(pop_rates)),col="blue",lty=2)
 
-# Subsetting data according to a specific genotype, clonal colony and/or identifier 
-subdata=subset_3vars(data,area,times)
-# Plotting the corresponding growth curves
-plot_growth(subdata$area,subdata$times,subdata$name)
+# Single population plots (from before)
 
-# Overlaying growth curves from various strains/identifiers/clonalcolonies
-# NB: code works for more than 2 strains/identifiers/clonalcolonies
-strain1=subset_strain(data,area,times)
-strain2=subset_strain(data,area,times)
-a2=list(strain1$area,strain2$area)
-t2=list(strain1$times,strain2$times)
-s2=list(strain1$name,strain2$name)
-plot_growth_overlay(a2,t2,s2)
+truevals=plot_growth(strain$area,strain$times,strain$name,Nsample=N)
+rates=truevals$rates
+expdata=strain$area[truevals$ind,]
+exptime=strain$times[truevals$ind,]
+
+# Entirely new data
+time=seq(0,35,0.5)
+simdata=matrix(0,nrow=length(rates),ncol=length(time))
+for (k in 1:length(rates)){
+  simdata[k,]=simExponential(rates[k],time)
+}
+
+# Using exisiting growth data and simulating forwards (This would probably make much more sense to do stochastically)
+lasttime=exptime[1,dim(exptime)[2]] #simulating forward from the last measured time interval (assuming they're all roughly the same)
+forwardtime=seq(lasttime+0.3,3*lasttime,0.3) #simulating forwards twice the length of the original experiment
+forwarddata=matrix(0,nrow=length(rates),ncol=length(forwardtime))
+newN0=expdata[,dim(expdata)[2]] #getting the last measured area as a starting pop'n for forward simulation
+for (k in 1:length(rates)){
+  forwarddata[k,]=simExponential(rates[k],forwardtime,N0=newN0[k])
+}
+totaldata=cbind(expdata,forwarddata)
+totaltime=cbind(t(as.numeric(exptime[1,])),t(forwardtime))
+#this is assuming that all the time points are exactly the same (which isn't entirely true but close enough...)
+
+# Population growth derived from microcolony growth rates
+Npop_sim=colSums(simdata)
+Npop_forwardsim=as.numeric(colSums(totaldata))
+#10 fold difference in starting value extrapolates exponentially
+
+# Plotting the population growth
+op=par(mfrow=c(2,1))
+single_pop_plot(Npop_sim,time,title="Simulated Population Growth",log=TRUE)
+single_pop_plot(Npop_forwardsim,totaltime,title="Forward Simulated Population Growth",log=TRUE)
+par(op)
+#according to the exponential model this should be a straight line!
