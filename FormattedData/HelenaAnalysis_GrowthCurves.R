@@ -1,28 +1,30 @@
 # Extracting Growth Cruves from the Formatted Data Sets: Lawless, Levy & Ziv 
 
+library(data.table)
+
 #####################Functions############################
 
 # Choosing a data set to work with
 dataset<-function(x){
   if (x == "Lawless"){
     # DataSet1: Lawless
-    area=read.table("Lawless_area.txt",header=FALSE)
-    times=read.table("Lawless_time.txt",header=FALSE)
-    data=read.table("Lawless_data.txt",header=FALSE) #3rd column (Identifier) => strain_parentcolony 
+    area=fread("Lawless_area.txt",header=FALSE)
+    times=fread("Lawless_time.txt",header=FALSE)
+    data=fread("Lawless_data.txt",header=FALSE) #3rd column (Identifier) => strain_parentcolony 
     return(list("area"=area,"data"=data,"times"=times))
   }
   else if (x == "Levy"){
     # DataSet2: Levy
-    area=read.table("Levy_area.txt",header=FALSE)
-    times=read.table("Levy_time.txt",header=FALSE)
-    data=read.table("Levy_data.txt",header=FALSE) #3rd column (Identifier) => replicate
+    area=fread("Levy_area.txt",header=FALSE)
+    times=fread("Levy_time.txt",header=FALSE)
+    data=fread("Levy_data.txt",header=FALSE) #3rd column (Identifier) => replicate
     return(list("area"=area,"data"=data,"times"=times))
   }
   else if (x == "Ziv"){
     # DataSet3: Ziv
-    area=read.table("Ziv_area.txt",header=FALSE)
-    times=read.table("Ziv_time.txt",header=FALSE)
-    data=read.table("Ziv_data.txt",header=FALSE) #3rd column (Identifier) => colony
+    area=fread("Ziv_area.txt",header=FALSE)
+    times=fread("Ziv_time.txt",header=FALSE)
+    data=fread("Ziv_data.txt",header=FALSE) #3rd column (Identifier) => colony
     return(list("area"=area,"data"=data,"times"=times))
   }
   else {print("Not a valid dataset")}
@@ -77,9 +79,9 @@ subset_3vars<-function(d,a,t,gen=total,cc=total,id=total){
 
 #Calculating the growth rate (LS for exponential model)
 LM_growthrate<-function(ai,ti){
-  fit<-lm(log(ai)~ti)
+  fit<-lm(log(ai)~ti) #this is applying the exponential model 
   rate=fit$coefficient[[2]]
-  return(rate)
+  return(list("rates"=rate,"fit"=fit))
 }
 
 #Getting breaks for a histogram 
@@ -92,8 +94,8 @@ hist_cells<-function(dat,int){
 
 # Plotting growth curve
 plot_growth<-function(a,t,s,Nsample=100,plot=TRUE){ 
-  if (dim(a)[1] < Nsample) {Nsample=dim(a)[1]} #cannot take sample larger than the population when replace=F
   #where area (a), times (t) and name (s) are required as input variables
+  if (dim(a)[1] < Nsample) {Nsample=dim(a)[1]} #cannot take sample larger than the population when replace=F
   indices=sample(1:dim(a)[1],Nsample,replace=FALSE)
   k=c()
   if(plot==TRUE){
@@ -282,7 +284,7 @@ colnames(data)=c("genotype","clonalcolony","identifier")
 area[area==0]=NA
 
 strain_names=unique(data$genotype)
-pickstrain=strain_names[2] #choose strain here!
+pickstrain=strain_names[1] #choose strain here!
 strain=subset_strain(data,area,times,pickstrain) 
 total=length(which(data$genotype==pickstrain))
 N=round(total*0.2)#using 20% of the total data for extrapolation
