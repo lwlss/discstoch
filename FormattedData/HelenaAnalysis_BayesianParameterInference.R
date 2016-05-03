@@ -1,9 +1,6 @@
 # Bayesian Parameter Inference
 # Set working directory to source file location 
 
-###### For non-well-behaved growth curves I sometimes keep getting this weird error "Failure to calculate log denisty"
-###### Not sure why; must be calculating some NaN values somewhere.... 
-
 library(rjags)
 library(data.table)
 
@@ -43,12 +40,12 @@ area[area==0]=NA
 
 N=dim(area)[2]
 
-pdf(height = 16, width = 16, file = "Linear_Regression_Output_Plots.pdf")
+pdf(height = 16, width = 16, file = "Linear_Regression_Output_Plots_1.pdf")
 a_total=c()
 b_total=c()
 for (i in 1:dim(area)[1]){ #64:68 for example works fine
   print(i)
-  jags<-jags.model('Linear_Regression.bug',
+  jags<-jags.model('Linear_Regression_1.bug',
                    data=list('y'=log(as.numeric(area[i,])), 'x'=as.numeric(times[i,]), 'N'=N), #names must be those in the JAGS model specification
                    n.chains=4, #how many parallele chains to run
                    n.adapt=1000) #how many samples to throw away as part of the adaptive sampling period for each chain
@@ -61,4 +58,10 @@ for (i in 1:dim(area)[1]){ #64:68 for example works fine
   b_total=c(b_total,mean(op1$b))
 }
 
-dev.off
+dev.off()
+
+Bayes_parameters=data.frame("Intercept"=a_total,"Rate"=b_total)
+filename=paste(datsetname,"_Bayes_parameters.txt",sep="")
+write.table(Bayes_parameters,filename,col.names=TRUE,row.names=FALSE)
+
+
