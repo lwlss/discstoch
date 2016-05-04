@@ -137,7 +137,7 @@ LevTest<-function(pick){
 }
 
 ######Data#####
-datsetname="Lawless"
+datsetname="Ziv"
 x=dataset(datsetname,ou.rm=TRUE)
 area=x$area
 times=x$times
@@ -146,15 +146,31 @@ residuals=x$residuals
 area[area==0]=NA
 identifier_names=unique(data$identifier)
 
-#Variances among strains (even those stemming from the parent paretn colony) are not equal... Heterogeneity in growth rate! 
-#Can use this test to justify why we are looking at single lineages, maybe... results are somewhat suspiciously close to zero
-LT_p=c()
-for(i in 1:length(identifier_names)){
-  pickid=identifier_names[i] #choose strain here!
-  identifier=subset_identifier(data,or_area,times,pickid)
-  LT=LevTest(identifier)
-  LT_p=c(LT_p,LT$`Pr(>F)`)
+# Durbin Watson Test 
+# this might a good way to filter which growth curves to look at for non-normally distributed residuals 
+DurbinWatson=c()
+for (i in 1:dim(area)[1]){
+  model=lm(log(as.numeric(area[i,]))~as.numeric(times[i,]))
+  DBtest=durbinWatsonTest(model)
+  DurbinWatson=c(DurbinWatson,DBtest$p) #return NA when all the values in the lineage are the same (i.e. zero growth)
 }
+
+#Storing the outputs in a file
+overwrite=paste(datsetname,"_residuals_normtests.txt",sep="")
+x=fread(overwrite,header=TRUE)
+write.table(cbind(DurbinWatson,x),overwrite,col.names=TRUE,row.names=FALSE)
+
+
+# #############Levene'sTest(maybe come back to this)#############
+# #Variances among strains (even those stemming from the parent paretn colony) are not equal... Heterogeneity in growth rate! 
+# #Can use this test to justify why we are looking at single lineages, maybe... results are somewhat suspiciously close to zero
+# LT_p=c()
+# for(i in 1:length(identifier_names)){
+#   pickid=identifier_names[i] #choose strain here!
+#   identifier=subset_identifier(data,or_area,times,pickid)
+#   LT=LevTest(identifier)
+#   LT_p=c(LT_p,LT$`Pr(>F)`)
+# }
 
 ###############StoredData#################
 
