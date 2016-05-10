@@ -165,7 +165,8 @@ for f in folders:
 
     # Make numpy array for storing results
     NBlbs=len(blbs)
-    res=numpy.zeros((FINALPHOT,NBlbs+1),numpy.float)    
+    res=numpy.zeros((FINALPHOT,NBlbs+1),numpy.float)
+    locs=numpy.zeros((NBlbs,4),numpy.int)  
 
     # Make directory for output images
     if not os.path.exists(os.path.join(fullpath,"OutputImages",f)):
@@ -199,9 +200,13 @@ for f in folders:
             #print maskedarea,cv.GetSize(black)
             cv.ResetImageROI(black)
             res[imno,blbno]=maskedarea
+            locs[blbno-1]=ROI
             blbno+=1
     # Write results for folder to file
     numpy.savetxt(f+"_OUT.txt",res,delimiter="\t")
+    numpy.savetxt(f+"_LOC.txt",locs,delimiter="\t")
+
+    
 
 ##        # For each final photo blob, sum pixels in all current blobs
 ##        for blob in blbs:
