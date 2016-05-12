@@ -1,4 +1,5 @@
-import cv, PIL, sys, os, numpy, random
+import cv2 as cv
+import PIL, sys, os, numpy, random
 from PIL import Image
 
 def showImage(im):
@@ -49,7 +50,7 @@ def makeBackground(folders):
     cv.CopyMakeBorder(backg,blnk,(25,25),1)
     return(blnk)
 
-def getBlobs(image,bk,showIms=False):
+def getBlobs(image,bk,showIms=False,DX=25,DY=25):
     '''Get masks representing microcolony sizes and positions'''
     imnum=0
     # Open image as colour
@@ -64,7 +65,7 @@ def getBlobs(image,bk,showIms=False):
     if showIms:
         cv.SaveImage("ShowImages%05d.png"%imnum,im2)
         imnum+=1
-    cv.SetImageROI(im2,(25,25,siz[0],siz[1]))
+    cv.SetImageROI(im2,(DX,DY,siz[0],siz[1]))
     cv.Copy(im,im2)
     cv.ResetImageROI(im2)
     if showIms:
@@ -134,6 +135,11 @@ def imageFromBlob(blobs,bk):
 # Final photo number...
 FINALPHOT=35
 
+# Size of border (px) to put around image
+DX,DY=25,25
+
+bigfnt=cv.InitFont(cv.CV_FONT_HERSHEY_SIMPLEX,2.0,2.0)
+colourbig=cv.CV_RGB(150,150,150)
 # Find all available image timecourses
 syspath = os.path.dirname(sys.argv[0])
 fullpath = os.path.abspath(syspath)
@@ -147,21 +153,21 @@ for f in allobj:
 backg=makeBackground(random.sample(folders,30))
 bk = cv.CreateImage(cv.GetSize(backg), cv.IPL_DEPTH_8U, 3)
 cv.Convert(backg,bk)
-showImage(bk)
+#showImage(bk)
 
 # Make new folder for writing output images
 if not os.path.exists("OutputImages"):
     os.makedirs("OutputImages")
 
 imdict={}
-fnt=cv.InitFont(cv.CV_FONT_HERSHEY_PLAIN,1.0,1.0)
+fnt=cv.InitFont(cv.CV_FONT_HERSHEY_PLAIN,1.5,1.5)
 bigfnt=cv.InitFont(cv.CV_FONT_HERSHEY_SIMPLEX,4.0,4.0)
 
 for f in folders:
     print(f)
     # Get blobs from final photo
     finalphoto="img_%09d__000.tif"%FINALPHOT
-    blbs=getBlobs(os.path.join(fullpath,f,finalphoto),bk)
+    blbs=getBlobs(os.path.join(fullpath,f,finalphoto),bk,DX=DX,DY=DY)
 
     # Make numpy array for storing results
     NBlbs=len(blbs)
@@ -200,62 +206,20 @@ for f in folders:
             #print maskedarea,cv.GetSize(black)
             cv.ResetImageROI(black)
             res[imno,blbno]=maskedarea
-            locs[blbno-1]=ROI
+            locs[blbno-1]=[ROI[0]-DX,ROI[1]-DY,ROI[2],ROI[3]]
             blbno+=1
+        blbno=0
+        for blb in blbs:
+            ROI=cv.BoundingRect(blb)
+            cv.PutText(black,str(blbno),(ROI[0],ROI[1]),fnt,colourbig)
+            blbno+=1
+            
+            
     # Write results for folder to file
     numpy.savetxt(f+"_OUT.txt",res,delimiter="\t")
     numpy.savetxt(f+"_LOC.txt",locs,delimiter="\t")
+    cv.SaveImage(f+"LOC.png",black)
 
-    
-
-##        # For each final photo blob, sum pixels in all current blobs
-##        for blob in blbs:
-##            for cblob in cblbs:
-##                
-
-##        totalarea=0.0
-##        cellcount=0
-##        while contour:
-##            area=cv.ContourArea(contour)
-##            if area>5.0:
-##                mom=cv.Moments(contour)
-##                cx=mom.m01/mom.m00
-##                cy=mom.m10/mom.m00
-##                totalarea+=area
-##                cellcount+=1
-##                #colourex=cv.CV_RGB(random.randint(0,255),random.randint(0,255),random.randint(0,255))
-##                colourex=cv.CV_RGB(255,255,255)
-##                colourfnt=cv.CV_RGB(255,255,0)
-##                colourbig=cv.CV_RGB(255,0,255)
-##                cv.DrawContours(imcol,contour,colourex,colourex,0,1,8)
-##                cv.DrawContours(imcol,contour,colourex,colourex,0,cv.CV_FILLED,8)
-##                #cv.Circle(imcol,(int(round(cy)),int(round(cx))),2,cv.CV_RGB(0,0,255),-1)
-##                cv.PutText(imcol,str(round(100.0*area/tot,3)),(int(round(cy)),int(round(cx))),fnt,colourfnt)
-##            contour=contour.h_next()
-##        # Overlay original cell sizes in red
-##        contour=cv.FindContours(firstim, storage, cv.CV_RETR_TREE, cv.CV_CHAIN_APPROX_SIMPLE, (0, 0))
-##        while contour:
-##            area=cv.ContourArea(contour)
-##            if area>5.0:
-##                colourex=cv.CV_RGB(255,0,0)
-##                cv.DrawContours(imcol,contour,colourex,colourex,0,1,8)
-##            contour=contour.h_next()
-##        cv.PutText(imcol,"% Area: "+str(round(100.0*totalarea/tot,2)),(int(round(0.1*siz[0])),int(round(0.8*siz[1]))),bigfnt,colourbig)
-##        cv.PutText(imcol,"Count: "+str(cellcount),(int(round(0.1*siz[0])),int(round(0.9*siz[1]))),bigfnt,colourbig)
-##        #showImage(imcol)
-##        cv.SaveImage(os.path.join(fullpath,"OutputImages",f,"Mod%05d.png"%tiffcount),imcol)
-##        cv.SaveImage(os.path.join(fullpath,"OutputImages",f,"Orig%05d.png"%tiffcount),im)
-##        tiffcount+=1
-##        imdict[f].append([imtim,totalarea,cellcount])
-##
-### Write results to file
-##out=open("ReportAA.txt","w")
-##out.write("%s\t%s\t%s\t%s\n"%("Culture","Time","TotalArea","Number"))
-##for f in imdict.keys():
-##    res=imdict[f]
-##    for row in res:
-##        out.write("%s\t%f\t%f\t%d\n"%(f,row[0],row[1],row[2]))
-##out.close()
 
 
     

@@ -2,6 +2,7 @@ import os
 import numpy
 import sys
 from PIL import Image
+import cv2 as cv
 
 syspath = os.path.dirname(sys.argv[0])
 fullpath = os.path.abspath(syspath)
@@ -18,7 +19,8 @@ tifs=[os.path.join(fullpath,folder,f) for f in os.listdir(os.path.join(fullpath,
 for j in range(min(len(tifs),FINALPHOT)):
     print("Getting blobs for "+tifs[j])
     im=Image.open(tifs[j])
+    imw,imh=im.size
     for i in range(len(locs)):
         x,y,w,h=locs[i]
-        blob=im.crop((x-w/2,y-h/2,x+w/2,y+h/2))
+        blob=im.crop((x,y,x+w,y+h))
         blob.save(os.path.join(outputdir,'Blob{:04d}_Image{:04d}.jpg'.format(i,j)))
