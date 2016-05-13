@@ -2,19 +2,24 @@ import os
 import numpy
 import sys
 from PIL import Image
-import cv2 as cv
+import cv2.cv as cv
 
 syspath = os.path.dirname(sys.argv[0])
 fullpath = os.path.abspath(syspath)
 
 # Splitting out individual timecourse images for each blob
 folder="R08C05"
+#folder="R03C03"
 FINALPHOT=35
 outputdir=os.path.join(fullpath,"Blobs_"+folder)
 if not os.path.exists(outputdir):
     os.makedirs(outputdir)
 
-locs=numpy.loadtxt(folder+"_LOC.txt",dtype=numpy.int,delimiter="\t")
+locs=numpy.loadtxt(folder+"_LOC.txt", delimiter="\t") #dtype=numpy.int,
+print(locs[1:10,:])
+locs=locs.astype(int) #added this line to deal with the issue above
+print(locs[1:10,:])
+
 tifs=[os.path.join(fullpath,folder,f) for f in os.listdir(os.path.join(fullpath,folder)) if ".tif" in f]
 for j in range(min(len(tifs),FINALPHOT)):
     print("Getting blobs for "+tifs[j])
