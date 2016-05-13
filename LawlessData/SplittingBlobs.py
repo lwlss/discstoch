@@ -4,6 +4,14 @@ import sys
 from PIL import Image
 import cv2.cv as cv
 
+import re
+
+numbers = re.compile(r'(\d+)')
+def numericalSort(value):
+    parts = numbers.split(value)
+    parts[1::2] = map(int, parts[1::2])
+    return parts
+
 syspath = os.path.dirname(sys.argv[0])
 fullpath = os.path.abspath(syspath)
 
@@ -15,17 +23,15 @@ outputdir=os.path.join(fullpath,"Blobs_"+folder)
 if not os.path.exists(outputdir):
     os.makedirs(outputdir)
 
-locs=numpy.loadtxt(folder+"_LOC.txt", delimiter="\t") #dtype=numpy.int,
-print(locs[1:10,:])
-locs=locs.astype(int) #added this line to deal with the issue above
-print(locs[1:10,:])
+locs=numpy.loadtxt(folder+"_LOC.txt", dtype=numpy.int, delimiter="\t")
 
 tifs=[os.path.join(fullpath,folder,f) for f in os.listdir(os.path.join(fullpath,folder)) if ".tif" in f]
+tifs=sorted(tifs,key=numericalSort) #makes sure files are sorted numerically
 for j in range(min(len(tifs),FINALPHOT)):
     print("Getting blobs for "+tifs[j])
     im=Image.open(tifs[j])
     imw,imh=im.size
-    for i in range(len(locs)):
+    for i in range(len(locs)): 
         x,y,w,h=locs[i]
         blob=im.crop((x,y,x+w,y+h))
         blob.save(os.path.join(outputdir,'Blob{:04d}_Image{:04d}.jpg'.format(i,j)))
