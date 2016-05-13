@@ -5,7 +5,7 @@ from PIL import Image
 import cv2.cv as cv
 
 import re
-
+# Solution of http://stackoverflow.com/questions/12093940/reading-files-in-a-particular-order-in-python
 numbers = re.compile(r'(\d+)')
 def numericalSort(value):
     parts = numbers.split(value)
