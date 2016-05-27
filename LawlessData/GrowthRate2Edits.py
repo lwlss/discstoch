@@ -105,7 +105,7 @@ def getBlobs(image,bk,showIms=False,DX=25,DY=25):
         i,(x,y),radius=cv.MinEnclosingCircle(contour)
         circumference=2*math.pi*radius
         area2=math.pi*(radius**2)
-        if (0<area/area2>0.8):
+        if (0<area/area2>0.80):
             FCA.append(contour)
         contour=contour.h_next()
     return(FCA)
@@ -176,8 +176,9 @@ for f in folders:
     ##THIS IS THE FUNCTION TO EDIT 
 
     # Make numpy array for storing results
-    NBlbs=len(blbs)
-    res=numpy.zeros((FINALPHOT,NBlbs+1),numpy.float) #why plus one? because the first row will be the time 
+    NBlbs=len(blbs) #how many blobs in the final photo
+    print(NBlbs)
+    res=numpy.zeros((FINALPHOT,NBlbs+1),numpy.float)
     locs=numpy.zeros((NBlbs,4),numpy.int)
 
     # Make directory for output images
@@ -206,25 +207,20 @@ for f in folders:
         # Paint all current blobs to an empty image
         black=cv.CreateImage(cv.GetSize(bk),8,1)
         colourex=cv.CV_RGB(255,255,255) #white
-        cblbno=0
         for cblb in cblbs:
             #draws a white contour around the blob
             cv.DrawContours(black,cblb,colourex,colourex,0,cv.CV_FILLED,8)
         blbno=1
-        for blb in blbs: #iterating through final photos
-            #Implement check for circle at each photo here!!!!!!!!!!
-            
+        for blb in blbs: #iterating through final photos            
             ROI=cv.BoundingRect(blb) #cuts out the rectangle of the last blob
             cv.SetImageROI(black,ROI) #for background specifies where rectangle goes
             maskedarea=cv.CountNonZero(black) #Area
             #print maskedarea, blbno, f
-            if maskedarea is not 0:
-                cv.ResetImageROI(black)
-                res[imno,blbno]=maskedarea
-                locs[blbno-1]=[ROI[0]-DX,ROI[1]-DY,ROI[2],ROI[3]]
-                blbno+=1
-            else:
-                print("Not a valid growth curve ")
+            #if maskedarea is not 0:
+            cv.ResetImageROI(black)
+            res[imno,blbno]=maskedarea
+            locs[blbno-1]=[ROI[0]-DX,ROI[1]-DY,ROI[2],ROI[3]]
+            blbno+=1
         blbno=0
         for blb in blbs:
             ROI=cv.BoundingRect(blb)
