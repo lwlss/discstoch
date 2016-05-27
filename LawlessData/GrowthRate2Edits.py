@@ -206,6 +206,8 @@ for f in folders:
         
         # Paint all current blobs to an empty image
         black=cv.CreateImage(cv.GetSize(bk),8,1)
+        #THIS IS NOT WORKING CORRECTLY; WHEN I PRINT THE IMAGE IT IS NEVER ACTUALLY BLACK (either grey or black with white spots on it)
+        #Only the very first iteration is working 
         colourex=cv.CV_RGB(255,255,255) #white
         for cblb in cblbs:
             #draws a white contour around the blob
@@ -215,8 +217,6 @@ for f in folders:
             ROI=cv.BoundingRect(blb) #cuts out the rectangle of the last blob
             cv.SetImageROI(black,ROI) #for background specifies where rectangle goes
             maskedarea=cv.CountNonZero(black) #Area
-            #print maskedarea, blbno, f
-            #if maskedarea is not 0:
             cv.ResetImageROI(black)
             res[imno,blbno]=maskedarea
             locs[blbno-1]=[ROI[0]-DX,ROI[1]-DY,ROI[2],ROI[3]]
