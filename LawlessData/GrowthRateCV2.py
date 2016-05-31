@@ -72,7 +72,7 @@ def getBlobs(image,bk,showIms=False,DX=25,DY=25):
         area=cv2.contourArea(c)
         (x,y,),r=cv2.minEnclosingCircle(c)
         area2=math.pi*(r**2)
-        if area/area2 > 0.7:
+        if area/area2 > 0.6:
             FCA.append(c)
     if showIms:
         final_contour_im=numpy.zeros(siz,numpy.uint8)
@@ -113,11 +113,11 @@ if not os.path.exists("OutputImages"):
 
 imdict={}
 # Iterating through all folders
-for f in folders[0:3]: #change this back to folders at the end 
+for f in folders:
     print(f)
     finalphoto="img_%09d__000.tif"%FINALPHOT
     impath=os.path.join(f,finalphoto)
-    blbs=getBlobs(impath,bk,showIms=True,DX=DX,DY=DY)
+    blbs=getBlobs(impath,bk,showIms=False,DX=DX,DY=DY)
     Nblbs=len(blbs) #number of blobs in the final photo
     res=numpy.zeros((FINALPHOT,Nblbs+1),numpy.float)
     locs=numpy.zeros((Nblbs,4),numpy.int)
@@ -144,10 +144,8 @@ for f in folders[0:3]: #change this back to folders at the end
         res[imno,0]=imtim #stores the time 
         # Get current blobs
         impath=os.path.join(fullpath,f,imname)
-        cblbs=getBlobs(impath,bk,showIms=True,DX=DX,DY=DY)
+        cblbs=getBlobs(impath,bk,showIms=False,DX=DX,DY=DY)
         currim=cv2.imread(impath,3)
-        #cv2.imshow("output",currim)
-        #cv2.waitKey(0)
         #gets ALL current blobs for that image number in that folder
 
         # Paint all current blobs to an empty image
@@ -161,44 +159,16 @@ for f in folders[0:3]: #change this back to folders at the end
             ROI=black[y:y+h,x:x+w]
             maskedarea=cv2.countNonZero(ROI)
             res[imno,blbno]=maskedarea
-            blob=currim[y:y+h,x:x+w]
-            #########CONTINUE HERE, NEED TO SAVE ALL BLOBS
-            #########WOULD LIKE TO GET TIME COURSE IMAGES AND AREA GROWTH CURVE IN ONE GO
-            locs[blbno-1]=[x,y,w,h]       
+            #blob=currim[y:y+h,x:x+w]
+            locs[blbno-1]=[x,y,w,h]
             blbno+=1
-            
-            
 
-### Write results for folder to file
-##numpy.savetxt(f+"_OUT.txt",res,delimiter="\t")
-##    #numpy.savetxt(f+"_LOC.txt",locs,delimiter="\t")
-##numpy.savetxt(f+"_LOC.txt",locs,delimiter="\t",fmt="%s")
-##cv.SaveImage(f+"LOC.png",black)
-                        
+    # Write results for folder to file
+    numpy.savetxt(f+"_OUT.txt",res,delimiter="\t")
+    numpy.savetxt(f+"_LOC.txt",locs,delimiter="\t",fmt="%s")
+    img=Image.fromarray(currim)
+    img.save(f+"LOC.png")                 
     
-    #cv2.imshow("output",new_im)
+    #cv2.imshow("output",currim)
     #cv2.waitKey(0)
-    
-
-cv2.destroyAllWindows()
-
-
-
-########## Old Stuff (To Be Deleted at the End) #########
-
-##def makeBackground(folders):
-##    NoSpots=len(folders)
-##    example=cv2.imread(os.path.join(folders[0],"img_000000000__000.tif"),3)
-##    siz=example.shape
-##    megarr=numpy.zeros((siz[0],siz[1],3,NoSpots),numpy.uint16)
-##    spot=0
-##    for f in folders:
-##        currim=cv2.imread(os.path.join(f,"img_000000000__000.tif"),3)
-##        megarr[:,:,:,spot]=numpy.asarray(currim)
-##        spot+=1
-##    bkg=numpy.array(numpy.round(numpy.median(megarr,axis=3)),dtype=numpy.uint16)
-##    cv2.copyMakeBorder(bkg,25,25,25,25,cv2.BORDER_REPLICATE)
-####    cv2.imshow("output",bkg)
-####    cv2.waitKey(0)
-##    return(bkg)
-##
+    #cv2.destroyAllWindows()
