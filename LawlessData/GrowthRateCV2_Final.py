@@ -27,31 +27,36 @@ def makeBackground(folders):
     new_image[:]=backg
     return(new_image)
 
+def makeBorder(image,bk,DX=25,DY=25):
+    '''Adds a border based on background around the image.'''
+    siz=image.shape #row, column = height, width
+    border_im=cv2.resize(bk,(2*DY+siz[1],2*DX+siz[0]),
+                         interpolation = cv2.INTER_CUBIC)
+    new_siz=border_im.shape
+    border_im[DY:new_siz[0]-DY,DX:new_siz[1]-DX]=image
+    return(border_im)
+
 def getBlobs(image,bk,showIms=False,DX=25,DY=25,np=False):
     '''Get masks representing microcolony sizes and positions'''
     # Open image as colour
     if np is False:
         im=cv2.imread(image,3)
-        siz=im.shape #row, column = height, width
+        siz=im.shape 
     else:
         im=image
-        siz=im.shape #row, column = height, width
+        siz=im.shape 
         
     if showIms:
         img=Image.fromarray(im,'RGB')
         img.save("1ShowImages.png")
 
     if np is False:
-        # Add border around image (based on background)
-        border_im=cv2.resize(bk,(2*DY+siz[1],2*DX+siz[0]),
-                             interpolation = cv2.INTER_CUBIC)
-        new_siz=border_im.shape
-        border_im[DY:new_siz[0]-DY,DX:new_siz[1]-DX]=im
+        border_im=makeBorder(im,bk,DX=DX,DY=DY)
         if showIms:
             img=Image.fromarray(border_im,'RGB')
             img.save("2ShowImages.png")
-        # Convert image to gray scale; use original image for canny edge map! 
-        im_gray=cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
+        # Convert image to gray scale
+        im_gray=cv2.cvtColor(border_im,cv2.COLOR_BGR2GRAY) #im before
         # Generate Canny Edge Map
         canny_im=cv2.Canny(im_gray,10,50,3)
         if showIms:
@@ -99,7 +104,7 @@ def getBlobs(image,bk,showIms=False,DX=25,DY=25,np=False):
         (x,y,),r=cv2.minEnclosingCircle(c)
         area2=math.pi*(r**2)
         if np is False:
-            if area/area2 > 0.65:
+            if area/area2 > (0.4+(area*0.0003)): #area/area2 > 0.7:
                 FCA.append(c)
                 FAA.append(area)
         else:
@@ -188,8 +193,8 @@ for f in folders:
         if blbs_area[blbno]<300:
             x=x-10
             y=y-10
-            w=w+10
-            h=h+10
+            w=w+20
+            h=h+20
         
         # Crop blob image and calculate the contours (should be only one!)
         timecourse_area=[]
@@ -200,6 +205,7 @@ for f in folders:
             impath=os.path.join(fullpath,f,imname)
             imtim=os.path.getmtime(impath)
             currim=cv2.imread(impath,3)
+            currim=makeBorder(currim,bk,DX=DX,DY=DY)
             ROI=currim[y:y+h,x:x+w]
             ROI_img=Image.fromarray(ROI)
             colony,colony_area=getBlobs(ROI,bk,showIms=False,DX=DX,DY=DY,np=True)
