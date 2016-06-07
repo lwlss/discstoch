@@ -9,9 +9,9 @@ library(fishplot)
 dataset<-function(x){
   if (x == "Lawless"){
     # DataSet1: Lawless
-    area=fread("Lawless_area_shortTC.txt",header=FALSE)
-    times=fread("Lawless_time_shortTC.txt",header=FALSE)
-    data=fread("Lawless_data_shortTC.txt",header=FALSE) #3rd column (Identifier) => strain_parentcolony
+    area=fread("Lawless_area_unfiltered.txt",header=FALSE)
+    times=fread("Lawless_time_unfiltered.txt",header=FALSE)
+    data=fread("Lawless_data_unfiltered.txt",header=FALSE) #3rd column (Identifier) => strain_parentcolony
     names(data)=c("genotype","clonalcolony","identifier","blobnumber")
     return(list("area"=area,"data"=data,"times"=times,"residuals"=residuals))
   }
@@ -41,16 +41,26 @@ data=x$data
 
 # Choosing a strain and extracting the data for it
 strain_names=unique(data$genotype)
-pickstrain=strain_names[1]#choose strain here!
+pickstrain=strain_names[2]#choose strain here!
 strain=subset_strain(data,area,times,pickstrain)
-plot_growth(strain$area,strain$times,strain$name,Nsample=dim(strain$area)[1],hist=TRUE)
+#plot_growth(strain$area,strain$times,strain$name,Nsample=dim(strain$area)[1],hist=TRUE)
+
+#Exclude time points of all zeros from the analyses
+zero_indices=which(rowSums(strain$area)==0)
+strain$area=strain$area[-zero_indices,]
+strain$times=strain$times[-zero_indices,]
+strain$data=strain$data[-zero_indices,]
 
 #Calculating the estimated growth rates for all growth curves of the strain
 strain_rates=c()
 strain_int=c()
+dist=c()
 for (i in 1:dim(strain$area)[1]){
-  k=LM_growthrate(as.numeric(strain$area[i,]),as.numeric(strain$times[i,]))$rate
+  k=LM_growthrate(strain$area[i,],strain$times[i,])$rate
   intercept=LM_growthrate(as.numeric(strain$area[i,]),as.numeric(strain$times[i,]))$int
+  fit=LM_growthrate(as.numeric(strain$area[i,]),as.numeric(strain$times[i,]))$fit
+  res=residuals(fit)
+  dist=c(dist,range(res)[1]-range(res)[2])
   strain_rates=c(strain_rates,k)
   strain_int=c(strain_int,intercept)
 }
