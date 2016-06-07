@@ -200,7 +200,7 @@ for f in folders:
             currim=makeBorder(currim,bk,DX=DX,DY=DY)
             ROI=currim[y:y+h,x:x+w]
             ROI_img=Image.fromarray(ROI)
-            display_image=True
+            display_image=False
             colony,colony_area=getBlobs(ROI,bk,showIms=display_image,DX=DX,DY=DY,np=True)
             
             # Only save data for single clonal colonies 
@@ -242,11 +242,11 @@ for f in folders:
                 outputdir,'Folder{}_Blob{:04d}_TimeCourse.jpg'.format(f,blbno)))
             if display_image:
                 blackwhite_image.save(os.path.join(
-                    outputdir,'Folder{}_Blob{:04d}_TimeCourse.jpg'.format(f,blbno)))
+                    outputdir,'Folder{}_Blob{:04d}_TimeCourse_BW.jpg'.format(f,blbno)))
             namespace.append(blbno)
             
             # Growth Curve for each blob
-            log=False
+            log=True
             time=[(i-timecourse_time[0])/3600 for i in timecourse_time]
             plt.figure(figsize=(6,4))
             if log:
