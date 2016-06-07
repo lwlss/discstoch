@@ -126,7 +126,7 @@ def getBlobs(image,bk,showIms=False,DX=25,DY=25,np=False):
 ############### Main Script ####################################################
 
 # Final Photo
-FINALPHOT=35
+FINALPHOT=20 #35; must be a number divisible by 5
 # Border size around the image
 DX, DY = 25,25
 
@@ -144,11 +144,6 @@ for f in allobj:
 # Generating a grey background of median pixels of all first images
 bk=makeBackground(folders) #random.sample(folders,30)
 
-# Make new folder for writing output images
-if not os.path.exists("OutputImages"):
-    os.makedirs("OutputImages")
-
-imdict={}
 # Iterating through all folders
 for f in folders:
     print(f)
@@ -162,12 +157,7 @@ for f in folders:
     img=Image.fromarray(black)
     img.save("Selected_Colonies_{}.png".format(f))
 
-    # Make directory for output images
-    if not os.path.exists(os.path.join(fullpath,"OutputImages",f)):
-        os.makedirs(os.path.join(fullpath,"OutputImages",f))
-
     # Find all photos available (before "final" photo)
-    imdict[f]=[]
     files=os.listdir(os.path.join(fullpath,f))
     #gets files with folder name in them 
     tiffs=[]
@@ -176,7 +166,7 @@ for f in folders:
     # Iterating through all the files in the folder
     files=sorted(files,key=numericalSort) #to order files numerically 
     for filename in files:
-        if ".tif" in filename and tiffcount<36: #only for files up to the final photo
+        if ".tif" in filename and tiffcount<(FINALPHOT+1):
             tiffs.append(filename)
             tiffcount+=1
 
@@ -186,17 +176,18 @@ for f in folders:
         os.makedirs(outputdir)
     
     # Getting the ROI for all blobs in the cut-off image
+    namespace=[]
     blbno=0
     counter=0
     for blb in blbs:
         x,y,w,h=cv2.boundingRect(blb)
-        if blbs_area[blbno]<300:
+        if blbs_area[blbno]<((bk.shape[0]*bk.shape[1])*0.000215): #300px
             x=x-10
             y=y-10
             w=w+20
             h=h+20
         
-        # Crop blob image and calculate the contours (should be only one!)
+        # Crop blob image and calculate the contours
         timecourse_area=[]
         timecourse_time=[]
         blob_images=numpy.empty([1,FINALPHOT],dtype=object)
@@ -212,7 +203,7 @@ for f in folders:
             
             # Only save data for single clonal colonies 
             if len(colony) is 1:
-                if imno is 0 and colony_area[0]>300.0:
+                if imno is 0 and colony_area[0]>((bk.shape[0]*bk.shape[1])*0.000215): #300px
                     print("Too big for a single colony")
                     pass
                 else: 
@@ -221,31 +212,36 @@ for f in folders:
                     blob_images[0,imno]=ROI_img
                 
         # Only save data for full time courses
-        if len(timecourse_area) is 35:
+        if len(timecourse_area) is FINALPHOT:
             if counter is 0:
                 folder_area=timecourse_area
                 folder_time=timecourse_time
                 folder_images=blob_images[0,:]
+                namespace.append(blbno)
                 counter+=1
             else:
                 folder_area=numpy.vstack((folder_area,timecourse_area))
                 folder_time=numpy.vstack((folder_time,timecourse_time))
                 folder_images=numpy.vstack((folder_images,blob_images))
+                namespace.append(blbno)
                 
             # Time course image for each blob
-            timecourse_image=Image.new('RGB',(7*w,5*h))
+            col=FINALPHOT/5
+            timecourse_image=Image.new('RGB',(col*w,5*h))
             x=0
             for i in range(0,5*h, h):
-                for j in range(0,7*w,w):
+                for j in range(0,col*w,w):
                     timecourse_image.paste(blob_images[0,x],(j,i))
                     x+=1
             timecourse_image.save(os.path.join(
                 outputdir,'Folder{}_Blob{:04d}_TimeCourse.jpg'.format(f,blbno)))
+            
             # Growth Curve for each blob
+            time=[(i-timecourse_time[0])/3600 for i in timecourse_time]
             plt.figure(figsize=(6,4))
-            plt.plot(timecourse_area,marker='o',ls='--')
-            plt.ylabel('Area')
-            plt.xlabel('Time')
+            plt.plot(time,timecourse_area,marker='o',ls='--')
+            plt.ylabel('Area (px)')
+            plt.xlabel('Time (h)')
             plt.title('Growth Curve for {} Blob {}'.format(f,blbno))
             plt.savefig(os.path.join(
                 outputdir,'Folder{}_Blob{:04d}_GrowthCurve.jpg'.format(f,blbno)))
@@ -263,7 +259,10 @@ for f in folders:
             final_image.save(os.path.join(
                 outputdir,'Folder{}_Blob{:04d}_TCGC.jpg'.format(f,blbno)))
         blbno+=1
-
+    # Saving the area and time according to folder name
+    numpy.savetxt(f+"_AREA_shortTC.txt",folder_area,delimiter="\t")
+    numpy.savetxt(f+"_TIME_shortTC.txt",folder_time,delimiter="\t")
+    numpy.savetxt(f+"_BLBNO_shortTC.txt",namespace,delimiter="\t")
 
         
     
