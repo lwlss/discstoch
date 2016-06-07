@@ -171,7 +171,7 @@ for f in folders:
             tiffcount+=1
 
     # Folder to save the output
-    outputdir=os.path.join(fullpath,"New_Blobs_"+f)
+    outputdir=os.path.join(fullpath,"New_Blobs_{}_".format(FINALPHOT)+f)
     if not os.path.exists(outputdir):
         os.makedirs(outputdir)
     
@@ -182,15 +182,16 @@ for f in folders:
     for blb in blbs:
         x,y,w,h=cv2.boundingRect(blb)
         if blbs_area[blbno]<((bk.shape[0]*bk.shape[1])*0.000215): #300px
-            x=x-10
-            y=y-10
-            w=w+20
-            h=h+20
+            x=int(round(x-((bk.shape[0]*bk.shape[1])*7.2e-06))) #10px
+            y=int(round(y-((bk.shape[0]*bk.shape[1])*7.2e-06)))
+            w=int(round(w+(2*((bk.shape[0]*bk.shape[1])*7.2e-06)))) #20px
+            h=int(round(h+(2*((bk.shape[0]*bk.shape[1])*7.2e-06))))
         
         # Crop blob image and calculate the contours
         timecourse_area=[]
         timecourse_time=[]
         blob_images=numpy.empty([1,FINALPHOT],dtype=object)
+        blob_bw_images=numpy.empty([1,FINALPHOT],dtype=object)
         for imno in range(0,FINALPHOT):
             imname=tiffs[imno]
             impath=os.path.join(fullpath,f,imname)
@@ -199,7 +200,8 @@ for f in folders:
             currim=makeBorder(currim,bk,DX=DX,DY=DY)
             ROI=currim[y:y+h,x:x+w]
             ROI_img=Image.fromarray(ROI)
-            colony,colony_area=getBlobs(ROI,bk,showIms=False,DX=DX,DY=DY,np=True)
+            display_image=True
+            colony,colony_area=getBlobs(ROI,bk,showIms=display_image,DX=DX,DY=DY,np=True)
             
             # Only save data for single clonal colonies 
             if len(colony) is 1:
@@ -210,6 +212,8 @@ for f in folders:
                     timecourse_area.append(colony_area[0])
                     timecourse_time.append(imtim)
                     blob_images[0,imno]=ROI_img
+                    if display_image:
+                        blob_bw_images[0,imno]=Image.open("5ShowImages.png")
                 
         # Only save data for full time courses
         if len(timecourse_area) is FINALPHOT:
@@ -217,37 +221,49 @@ for f in folders:
                 folder_area=timecourse_area
                 folder_time=timecourse_time
                 folder_images=blob_images[0,:]
-                namespace.append(blbno)
                 counter+=1
             else:
                 folder_area=numpy.vstack((folder_area,timecourse_area))
                 folder_time=numpy.vstack((folder_time,timecourse_time))
                 folder_images=numpy.vstack((folder_images,blob_images))
-                namespace.append(blbno)
                 
             # Time course image for each blob
             col=FINALPHOT/5
             timecourse_image=Image.new('RGB',(col*w,5*h))
+            blackwhite_image=Image.new('RGB',(col*w,5*h))
             x=0
             for i in range(0,5*h, h):
                 for j in range(0,col*w,w):
                     timecourse_image.paste(blob_images[0,x],(j,i))
+                    if display_image:
+                        blackwhite_image.paste(blob_bw_images[0,x],(j,i))
                     x+=1
             timecourse_image.save(os.path.join(
                 outputdir,'Folder{}_Blob{:04d}_TimeCourse.jpg'.format(f,blbno)))
+            if display_image:
+                blackwhite_image.save(os.path.join(
+                    outputdir,'Folder{}_Blob{:04d}_TimeCourse.jpg'.format(f,blbno)))
+            namespace.append(blbno)
             
             # Growth Curve for each blob
+            log=False
             time=[(i-timecourse_time[0])/3600 for i in timecourse_time]
             plt.figure(figsize=(6,4))
+            if log:
+                timecourse_area=[math.log(i) for i in timecourse_area]
+                plt.ylabel('log(Area) (log(px))')
+                output_name='Folder{}_Blob{:04d}_Log_'.format(f,blbno)
+            else:
+                plt.ylabel('Area (px)')
+                output_name='Folder{}_Blob{:04d}_'.format(f,blbno)
             plt.plot(time,timecourse_area,marker='o',ls='--')
-            plt.ylabel('Area (px)')
             plt.xlabel('Time (h)')
             plt.title('Growth Curve for {} Blob {}'.format(f,blbno))
             plt.savefig(os.path.join(
-                outputdir,'Folder{}_Blob{:04d}_GrowthCurve.jpg'.format(f,blbno)))
+                outputdir,output_name+'GrowthCurve.jpg'))
             plt.close()
             growth_curve=Image.open(os.path.join(
-                outputdir,'Folder{}_Blob{:04d}_GrowthCurve.jpg'.format(f,blbno)))
+                outputdir,output_name+'GrowthCurve.jpg'.format(f,blbno)))
             # Growth Curves + Time course Images for each blob
             gcw,gch=growth_curve.size
             width,height=timecourse_image.size
@@ -257,13 +273,10 @@ for f in folders:
             final_image.paste(timecourse_image,((gcw-(width))/2,0))
             final_image.paste(growth_curve,(0,height))
             final_image.save(os.path.join(
-                outputdir,'Folder{}_Blob{:04d}_TCGC.jpg'.format(f,blbno)))
+                outputdir,output_name+'TCGC.jpg'))
         blbno+=1
     # Saving the area and time according to folder name
-    numpy.savetxt(f+"_AREA_shortTC.txt",folder_area,delimiter="\t")
-    numpy.savetxt(f+"_TIME_shortTC.txt",folder_time,delimiter="\t")
-    numpy.savetxt(f+"_BLBNO_shortTC.txt",namespace,delimiter="\t")
-
-        
-    
+    numpy.savetxt(f+"_AREA.txt",folder_area,delimiter="\t")
+    numpy.savetxt(f+"_TIME.txt",folder_time,delimiter="\t")
+    numpy.savetxt(f+"_BLBNO.txt",namespace,delimiter="\t")
 
