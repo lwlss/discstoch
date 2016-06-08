@@ -41,7 +41,7 @@ data=x$data
 
 # Choosing a strain and extracting the data for it
 strain_names=unique(data$genotype)
-pickstrain=strain_names[2]#choose strain here!
+pickstrain=strain_names[1]#choose strain here!
 strain=subset_strain(data,area,times,pickstrain)
 #plot_growth(strain$area,strain$times,strain$name,Nsample=dim(strain$area)[1],hist=TRUE)
 
@@ -64,6 +64,37 @@ for (i in 1:dim(strain$area)[1]){
   strain_rates=c(strain_rates,k)
   strain_int=c(strain_int,intercept)
 }
+
+zero_indices=which(rowSums(area)==0)
+area=area[-zero_indices,]
+data=data[-zero_indices,]
+times=times[-zero_indices,]
+
+all_rates=c()
+all_int=c()
+all_dist=c()
+for (i in 1:dim(area)[1]){
+  k=LM_growthrate(area[i,],times[i,])$rate
+  intercept=LM_growthrate(as.numeric(area[i,]),as.numeric(times[i,]))$int
+  fit=LM_growthrate(as.numeric(area[i,]),as.numeric(times[i,]))$fit
+  res=residuals(fit)
+  all_dist=c(all_dist,range(res)[1]-range(res)[2])
+  all_rates=c(all_rates,k)
+  all_int=c(all_int,intercept)
+}
+
+#Saving the range of the residuals according to blob number
+res_data=cbind(dist,strain$data$clonalcolony,strain$data$blobnumber)
+
+#Don't trust zero residuals and NA rates
+all_dist[which(is.na(all_rates))]=min(all_dist)
+all_rates[which(is.na(all_rates))]=0
+all_rates[which(all_rates<0)]=0
+#Make distance positive
+all_dist=abs(all_dist)
+#Save useful info
+all_res_data=cbind(all_dist,all_rates,data$clonalcolony,data$blobnumber)
+write.table(all_res_data,"Lawless_ResidualRange.txt",col.names=FALSE,row.names=FALSE)
 
 #Setting growth rates <0 equal to 0
 strain_rates[which(strain_rates<0)]=0
