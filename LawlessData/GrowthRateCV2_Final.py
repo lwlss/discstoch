@@ -65,7 +65,7 @@ def makeBorder(image,bk,DX=25,DY=25):
     border_im[DY:new_siz[0]-DY,DX:new_siz[1]-DX]=image
     return(border_im)
 
-def getBlobs(image,bk,showIms=False,DX=25,DY=25,np=False):
+def getBlobs(image,bk,showIms=False,DX=25,DY=25,np=False,apply_filt=True):
     '''Get masks representing microcolony sizes and positions'''
     # Open image as colour
     if np is False:
@@ -132,17 +132,20 @@ def getBlobs(image,bk,showIms=False,DX=25,DY=25,np=False):
         area=cv2.contourArea(c)
         (x,y,),r=cv2.minEnclosingCircle(c)
         area2=math.pi*(r**2)
-        if np is False:
+        if np is False and apply_filt is True:
             if area/area2 > (0.4+(area*0.0003)): #area/area2 > 0.7:
                 FCA.append(c)
                 FAA.append(area)
         else:
-            if area/area2 > (0.32+(area*0.0003)):
+            if area/area2 > (0.32+(area*0.0003)) and apply_filt is True:
                 #this is the most stringent cut-off I would set to get a
                 #"very high-quality data set" as this eliminates all previously
                 #identified issues; could change the 0.32 to 0.3 or eliminate the
                 #area cut-off at this point entirely to get a greater number of
                 #growth rates which do contain more experimental errors though! 
+                FCA.append(c)
+                FAA.append(area)
+        if apply_filt is False:
                 FCA.append(c)
                 FAA.append(area)
     if showIms:
@@ -198,19 +201,23 @@ if res:
     colour_chart_res=numpy.zeros((1000,110,3),numpy.uint8)
     centers=range(50,1000,100)
     for x in range(0,len(colours)):
-        cv2.circle(colour_chart_res,(25,centers[x]),20,colours[x],-1)
+        cv2.circle(colour_chart_res,(25,centers[x]+20),20,colours[x],-1)
         cv2.putText(colour_chart_res,str(res_range[x]), (55,centers[x]+10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255))
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255))
+    cv2.putText(colour_chart_res,"Res. Dist.",(10,30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
     img_res=Image.fromarray(colour_chart_res)
     img_res.save("Colour_Chart_Res.png")
     img_res.show()
-if rate:
+if rates:
     colour_chart_rate=numpy.zeros((1000,110,3),numpy.uint8)
     centers=range(50,1000,100)
-    for y in range(0,len(colours2)):
-        cv2.circle(colour_chart_rate,(25,centers[y]),10,colours2[y],-1)
-        cv2.putText(colour_chart_rate,str(rates_range[y]), (55,centers[x]+10),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255))
+    for z in range(0,len(colours2)):
+        cv2.circle(colour_chart_rate,(25,centers[z]+20),10,colours2[z],-1)
+        cv2.putText(colour_chart_rate,str(rates_range[z]), (55,centers[z]+10),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255,255,255))
+    cv2.putText(colour_chart_rate,"Growth Rates",(0,30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
     img_rate=Image.fromarray(colour_chart_rate)
     img_rate.save("Colour_Chart_Rate.png")
     img_rate.show()
@@ -220,7 +227,8 @@ for f in folders:
     print(f)
     finalphoto="img_%09d__000.tif"%FINALPHOT
     impath=os.path.join(f,finalphoto)
-    blbs,blbs_area=getBlobs(impath,bk,showIms=False,DX=DX,DY=DY,np=False)
+    blbs,blbs_area=getBlobs(impath,bk,showIms=False,DX=DX,DY=DY,
+                            np=False,apply_filt=apply_filt)
 
     # Paint all final blobs to an empty image
     black=numpy.zeros((bk.shape[0],bk.shape[1]),numpy.uint8)
@@ -271,7 +279,7 @@ for f in folders:
                 col_index=[ind for ind,it in enumerate(res_range) if it==col_val]
                 cent=(int(x+(w/2.0)),int(y+h/2.0))
                 cv2.circle(res_black,cent,20,colours[col_index[0]],-1)
-                if rate:
+                if rates:
                     curr_rate=dist[index[0]]
                     col_val2=min(rates_range, key=lambda x:abs(x-round(curr_rate,1)))
                     col_index2=[ind for ind,it in enumerate(rates_range) if it==col_val2]
@@ -297,7 +305,8 @@ for f in folders:
             ROI=currim[y:y+h,x:x+w]
             ROI_img=Image.fromarray(ROI)
             display_image=False
-            colony,colony_area=getBlobs(ROI,bk,showIms=display_image,DX=DX,DY=DY,np=True)
+            colony,colony_area=getBlobs(ROI,bk,showIms=display_image,DX=DX,DY=DY,
+                                        np=True,apply_filt=apply_filt)
             
             # Only save data for single clonal colonies 
             if len(colony) is 1 and apply_filt is True:
@@ -336,7 +345,7 @@ for f in folders:
                 folder_images=numpy.vstack((folder_images,blob_images))
 
         # Time courses for when there is no filter
-        if apply_filt is False and sum(timecourse_area)>0:
+        if apply_filt is False: #and sum(timecourse_area)>0
             if counter is 0:
                 folder_area=timecourse_area
                 folder_time=timecourse_time
@@ -398,13 +407,11 @@ for f in folders:
         blbno+=1
 
     # Save residual range coloured image
-    img=Image.fromarray(res_black)
-    img.save("Residuals_{}.png".format(f))
+    if res:
+        img=Image.fromarray(res_black)
+        img.save("Residuals_{}.png".format(f))
     
     # Save the area and time according to folder name
     numpy.savetxt(f+"_UNFILTERED_AREA.txt",folder_area,delimiter="\t")
     numpy.savetxt(f+"_UNFILTERED_TIME.txt",folder_time,delimiter="\t")
     numpy.savetxt(f+"_UNFILTERED_BLBNO.txt",namespace,delimiter="\t")
-
-#Print reference scales for colour maps 
-
