@@ -10,26 +10,27 @@ detLog=function(K,r,c0,t){
   return(K*c0*exp(r*t)/(K+c0*(exp(r*t)-1)))
 }
 
+const_approx=function(x,y,t1){
+  af=approxfun(x,y,method="constant")
+  return(af(t1))
+}
+
 Rcpp::cppFunction(
-  'NumericVector simDt_cpp(int K=1000, double r=1.0, int N0=0, int NSwitch=100, double t0=0, double t1=1) {
+  'NumericVector simDt_cpp(int K=1000, double r=1.0, int N0=1, int NSwitch=100, double t0=0, double t1=1) {
   Environment myEnv = Environment::global_env();
   Function detLog = myEnv["detLog"];
+  Function const_approx = myEnv["const_approx"];
     if (NSwitch>N0){
       int eventN0=NSwitch-N0;
       NumericVector unifs=runif(eventN0);
       IntegerVector nn = seq(N0,NSwitch);
       NumericVector clist = as<NumericVector>(nn);
-      NumericVector dts=-log(unifs)/(r*clist[seq(2,(eventN0+1))]*(1-clist[seq(2,(eventN0+1))]/K));
+      NumericVector dts=-log(unifs)/(r*clist[seq(1,(eventN0))]*(1-clist[seq(1,(eventN0))]/K));
       NumericVector ats=cumsum(dts);
       ats.push_front(t0);
       double tmax=max(ats);
       if (tmax>=t1){
-        Environment stats("package:stats");
-        Function approxfun = stats["approxfun"];
-        Rf_PrintValue(ats);
-        Rf_PrintValue(clist);
-        NumericVector af=approxfun(ats,clist,"constant");
-        return af(t1);
+        return const_approx(ats,clist,t1);
       }else{
         return detLog(K,r,NSwitch,t1-tmax);
       }
@@ -55,9 +56,10 @@ simDt=function(K=1000,r=1,N0=1,NSwitch=100,t0=0,t1=1){
     if(tmax>=t1){
       # Interpolate for estimate of c at t1
       print(ats)
-      print(length(ats))
-      print(length(clist))
+      print(clist)
       af=approxfun(ats,clist,method="constant")
+      print(af)
+      print(af(t1))
       return(af(t1))	
     }else{
       # Deterministic simulation from tmax to t1
