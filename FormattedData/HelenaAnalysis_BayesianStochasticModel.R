@@ -3,42 +3,13 @@ setwd("~/BayesianInference")
 library(data.table)
 library(detstocgrowth)
 library(Rcpp)
+library(smfsb)
 
 ####################################### Functions ########################################################
 
 detLog=function(K,r,c0,t){
   return(K*c0*exp(r*t)/(K+c0*(exp(r*t)-1)))
 }
-
-const_approx=function(x,y,t1){
-  af=approxfun(x,y,method="constant")
-  return(af(t1))
-}
-
-Rcpp::cppFunction(
-  'NumericVector simDt_cpp(int K=1000, double r=1.0, int N0=1, int NSwitch=100, double t0=0, double t1=1) {
-  Environment myEnv = Environment::global_env();
-  Function detLog = myEnv["detLog"];
-  Function const_approx = myEnv["const_approx"];
-    if (NSwitch>N0){
-      int eventN0=NSwitch-N0;
-      NumericVector unifs=runif(eventN0);
-      IntegerVector nn = seq(N0,NSwitch);
-      NumericVector clist = as<NumericVector>(nn);
-      NumericVector dts=-log(unifs)/(r*clist[seq(1,(eventN0))]*(1-clist[seq(1,(eventN0))]/K));
-      NumericVector ats=cumsum(dts);
-      ats.push_front(t0);
-      double tmax=max(ats);
-      if (tmax>=t1){
-        return const_approx(ats,clist,t1);
-      }else{
-        return detLog(K,r,NSwitch,t1-tmax);
-      }
-    }else{
-      return detLog(K,r,N0,t1-t0);
-    }
-  }'
-)
 
 # Hybrid model expressed as number of cells at time t1, after starting at t0
 simDt=function(K=1000,r=1,N0=1,NSwitch=100,t0=0,t1=1){
@@ -55,11 +26,7 @@ simDt=function(K=1000,r=1,N0=1,NSwitch=100,t0=0,t1=1){
     tmax=max(ats)
     if(tmax>=t1){
       # Interpolate for estimate of c at t1
-      print(ats)
-      print(clist)
       af=approxfun(ats,clist,method="constant")
-      print(af)
-      print(af(t1))
       return(af(t1))	
     }else{
       # Deterministic simulation from tmax to t1
@@ -70,8 +37,39 @@ simDt=function(K=1000,r=1,N0=1,NSwitch=100,t0=0,t1=1){
   }
 }
 
-# Writing the above function in Rcpp
+Rcpp::cppFunction(
+  'DataFrame simDt1_rcpp(int K, double r, int N0, int NSwitch, double t0){
+  int eventN0=NSwitch-N0;
+  NumericVector unifs=runif(eventN0);
+  IntegerVector nn = seq(N0,NSwitch);
+  NumericVector clist = as<NumericVector>(nn);
+  NumericVector dts=-log(unifs)/(r*clist[seq(1,(eventN0))]*(1-clist[seq(1,(eventN0))]/K));
+  NumericVector ats=cumsum(dts);
+  ats.push_front(t0);
+  return DataFrame::create(_["ats"]=ats,_["clist"]=clist);
+  }'
+)
 
+simDt1=function(K=1000,r=1,N0=1,NSwitch=100,t0=0,t1=1){
+  if(NSwitch>N0){
+    # Unusually, for this model, we know the number of events a priori
+    curr_data=simDt1_rcpp(K,r,N0,NSwitch,t0)
+    ats=curr_data$ats
+    ats[2:length(ats)]=ats[2:length(ats)]+t0
+    clist=curr_data$clist
+    tmax=max(ats)
+    if(tmax>=t1){
+      # Interpolate for estimate of c at t1
+      af=approxfun(ats,clist,method="constant")
+      return(af(t1))	
+    }else{
+      # Deterministic simulation from tmax to t1
+      return(detLog(K,r,NSwitch,t1-tmax))
+    }
+  }else{
+    return(detLog(K,r,N0,t1-t0))
+  }
+}
 
 ###################################### Main ##############################################################
 
@@ -126,9 +124,11 @@ plot(modelled_data$c,as.numeric(rownames(modelled_data)),
 switchN=1000
 
 # Step Function for pfMLLik
-stepSim=function(x0=1, t0=0, deltat=1, th = c(100,3))  simDt_cpp(th[1],th[2],x0,switchN,t0,t0+deltat)
+stepSim=function(x0=1, t0=0, deltat=1, th = c(100,3))  simDt(th[1],th[2],x0,switchN,t0,t0+deltat)
+stepSim_rcpp=function(x0=1, t0=0, deltat=1, th = c(100,3))  simDt1(th[1],th[2],x0,switchN,t0,t0+deltat)
 
 # Log likelihood of the observation
+noiseSD=10
 dataLik<-function(x,t,y,log=TRUE,...){
   ll=sum(dnorm(y,x,noiseSD,log=TRUE))
   if(log)
@@ -147,7 +147,6 @@ simx0=function(N,t0,...){
 # Marginal likelihood
 pfMLLik=function (n, simx0, t0, stepFun, dataLik, data)
 {
-  print("1 Got here fine")
   times = c(t0, as.numeric(rownames(data)))
   deltas = diff(times)
   return(function(...) {
@@ -171,20 +170,19 @@ pfMLLik=function (n, simx0, t0, stepFun, dataLik, data)
       xmat = as.matrix(xmat[rows, ])
     }
     ll
-    print("2 Got here fine")
   })
 }
 
-mLLik=pfMLLik(5,simx0,0,stepSim,dataLik,modelled_data)
+mLLik=pfMLLik(10,simx0,0,stepSim,dataLik,modelled_data)
 
 #Check a best guess in the particle filter
 print(mLLik(th=c(1000,0.2))) #K,r
 
 # MCMC algorithm
-date()
-iters=1000
+print(date())
+iters=100000
 tune=0.01
-thin=10
+thin=1000
 # Flat priors - change these to uniform priors such that K~(60,1000), r~(0,3)
 th=c(K = 1000, r = 0.2)
 p=length(th)
@@ -205,7 +203,7 @@ for (i in 1:iters) {
   thmat[i,]=th
 }
 message("Done!")
-date()
+print(date())
 # Compute and plot some basic summaries
 mcmcSummary(thmat)
 print(apply(thmat,2,mean))
