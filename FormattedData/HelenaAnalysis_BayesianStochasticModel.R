@@ -1,9 +1,12 @@
 # Bayesian Stochastic Model 
-setwd("~/BayesianInference")
+
 library(data.table)
 library(detstocgrowth)
 library(Rcpp)
 library(smfsb)
+
+setwd("~/BayesianInference")
+Rcpp::sourceCpp('~/StochasticFunctions.cpp')
 
 ####################################### Functions ########################################################
 
@@ -37,39 +40,39 @@ simDt=function(K=1000,r=1,N0=1,NSwitch=100,t0=0,t1=1){
   }
 }
 
-Rcpp::cppFunction(
-  'DataFrame simDt1_rcpp(int K, double r, int N0, int NSwitch, double t0){
-  int eventN0=NSwitch-N0;
-  NumericVector unifs=runif(eventN0);
-  IntegerVector nn = seq(N0,NSwitch);
-  NumericVector clist = as<NumericVector>(nn);
-  NumericVector dts=-log(unifs)/(r*clist[seq(1,(eventN0))]*(1-clist[seq(1,(eventN0))]/K));
-  NumericVector ats=cumsum(dts);
-  ats.push_front(t0);
-  return DataFrame::create(_["ats"]=ats,_["clist"]=clist);
-  }'
-)
-
-simDt1=function(K=1000,r=1,N0=1,NSwitch=100,t0=0,t1=1){
-  if(NSwitch>N0){
-    # Unusually, for this model, we know the number of events a priori
-    curr_data=simDt1_rcpp(K,r,N0,NSwitch,t0)
-    ats=curr_data$ats
-    ats[2:length(ats)]=ats[2:length(ats)]+t0
-    clist=curr_data$clist
-    tmax=max(ats)
-    if(tmax>=t1){
-      # Interpolate for estimate of c at t1
-      af=approxfun(ats,clist,method="constant")
-      return(af(t1))	
-    }else{
-      # Deterministic simulation from tmax to t1
-      return(detLog(K,r,NSwitch,t1-tmax))
-    }
-  }else{
-    return(detLog(K,r,N0,t1-t0))
-  }
-}
+# Rcpp::cppFunction(
+#   'DataFrame simDt1_rcpp(int K, double r, int N0, int NSwitch, double t0){
+#   int eventN0=NSwitch-N0;
+#   NumericVector unifs=runif(eventN0);
+#   IntegerVector nn = seq(N0,NSwitch);
+#   NumericVector clist = as<NumericVector>(nn);
+#   NumericVector dts=-log(unifs)/(r*clist[seq(1,(eventN0))]*(1-clist[seq(1,(eventN0))]/K));
+#   NumericVector ats=cumsum(dts);
+#   ats.push_front(t0);
+#   return DataFrame::create(_["ats"]=ats,_["clist"]=clist);
+#   }'
+# )
+# 
+# simDt1=function(K=1000,r=1,N0=1,NSwitch=100,t0=0,t1=1){
+#   if(NSwitch>N0){
+#     # Unusually, for this model, we know the number of events a priori
+#     curr_data=simDt1_rcpp(K,r,N0,NSwitch,t0)
+#     ats=curr_data$ats
+#     ats[2:length(ats)]=ats[2:length(ats)]+t0
+#     clist=curr_data$clist
+#     tmax=max(ats)
+#     if(tmax>=t1){
+#       # Interpolate for estimate of c at t1
+#       af=approxfun(ats,clist,method="constant")
+#       return(af(t1))	
+#     }else{
+#       # Deterministic simulation from tmax to t1
+#       return(detLog(K,r,NSwitch,t1-tmax))
+#     }
+#   }else{
+#     return(detLog(K,r,N0,t1-t0))
+#   }
+# }
 
 ###################################### Main ##############################################################
 
@@ -125,7 +128,7 @@ switchN=1000
 
 # Step Function for pfMLLik
 stepSim=function(x0=1, t0=0, deltat=1, th = c(100,3))  simDt(th[1],th[2],x0,switchN,t0,t0+deltat)
-stepSim_rcpp=function(x0=1, t0=0, deltat=1, th = c(100,3))  simDt1(th[1],th[2],x0,switchN,t0,t0+deltat)
+stepSim_cpp=function(x0=1, t0=0, deltat=1, th = c(100,3))  simDt_cpp(th[1],th[2],x0,switchN,t0,t0+deltat)
 
 # Log likelihood of the observation
 noiseSD=10
@@ -158,6 +161,7 @@ pfMLLik=function (n, simx0, t0, stepFun, dataLik, data)
       # if statements, seq function and a:b notation don't play nice with vectorisation...
       for(j in 1:n) {
         xmat[j,]=stepFun(x0=xmat[j,],t0=times[i],deltat=deltas[i],...)
+        print(xmat[j,])
         w[j]=dataLik(xmat[j,],t=times[i+1],y=data[i,],log=FALSE,...)
       }
       if (max(w) < 1e-20) {
@@ -173,16 +177,16 @@ pfMLLik=function (n, simx0, t0, stepFun, dataLik, data)
   })
 }
 
-mLLik=pfMLLik(10,simx0,0,stepSim,dataLik,modelled_data)
+mLLik=pfMLLik(10,simx0,0,stepSim_cpp,dataLik,modelled_data)
 
 #Check a best guess in the particle filter
 print(mLLik(th=c(1000,0.2))) #K,r
 
 # MCMC algorithm
 print(date())
-iters=100000
+iters=1000
 tune=0.01
-thin=1000
+thin=10
 # Flat priors - change these to uniform priors such that K~(60,1000), r~(0,3)
 th=c(K = 1000, r = 0.2)
 p=length(th)
