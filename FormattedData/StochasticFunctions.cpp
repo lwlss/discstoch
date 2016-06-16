@@ -48,22 +48,18 @@ NumericMatrix mcmc_cpp(int p, double tune, int iters, int thin, Function mLLik, 
   double ll=-1e99;
   NumericMatrix thmat(iters,p);
   for (int i=0; i<iters; i=i+1){
-    Rcout << "Iter " << i << std::endl;
+    NumericVector thi=th;
+    Rcout << i << " ";
     for(int j=0; j<thin; j=j+1){
-      NumericVector thprob=th*exp(rnorm(p,0,tune));
+      NumericVector thprob=thi*exp(rnorm(p,0,tune));
       NumericVector llprob=mLLik(thprob);
       NumericVector pr=log(runif(1));
-      Rcout << "llstuff " << llprob[0]-ll << std::endl;
-      Rcout << "Prob " << pr[0] << std::endl;
       if (pr[0]<(llprob[0]-ll)){
-        NumericVector th=thprob;
-        NumericVector ll=llprob;
-        Rcout << "thprob " << thprob << std::endl;
-        Rcout << "llprob " << llprob << std::endl;
+        thi=thprob;
+        ll=llprob[0];
       }
     }
-    Rcout << "th " << th << std::endl;
-    thmat(i,_)=th;
+    thmat(i,_)=thi;
   }
   return thmat;
 }
