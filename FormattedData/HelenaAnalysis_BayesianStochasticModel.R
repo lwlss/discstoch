@@ -4,6 +4,7 @@ library(data.table)
 library(detstocgrowth)
 library(Rcpp)
 library(smfsb)
+library(microbenchmark)
 
 setwd("~/BayesianInference")
 Rcpp::sourceCpp('~/StochasticFunctions.cpp')
@@ -27,7 +28,7 @@ simDt=function(K=1000,r=1,N0=1,NSwitch=100,t0=0,t1=1){
     # Absolute times
     ats=c(t0,t0+cumsum(dts))
     tmax=max(ats)
-    if(tmax>=t1){
+    if(tmax>=t1){ #assume max t from stochastic is same as t1 or do linear interpolation 
       # Interpolate for estimate of c at t1
       af=approxfun(ats,clist,method="constant")
       return(af(t1))	
@@ -40,39 +41,102 @@ simDt=function(K=1000,r=1,N0=1,NSwitch=100,t0=0,t1=1){
   }
 }
 
-# Rcpp::cppFunction(
-#   'DataFrame simDt1_rcpp(int K, double r, int N0, int NSwitch, double t0){
-#   int eventN0=NSwitch-N0;
-#   NumericVector unifs=runif(eventN0);
-#   IntegerVector nn = seq(N0,NSwitch);
-#   NumericVector clist = as<NumericVector>(nn);
-#   NumericVector dts=-log(unifs)/(r*clist[seq(1,(eventN0))]*(1-clist[seq(1,(eventN0))]/K));
-#   NumericVector ats=cumsum(dts);
-#   ats.push_front(t0);
-#   return DataFrame::create(_["ats"]=ats,_["clist"]=clist);
-#   }'
-# )
-# 
-# simDt1=function(K=1000,r=1,N0=1,NSwitch=100,t0=0,t1=1){
-#   if(NSwitch>N0){
-#     # Unusually, for this model, we know the number of events a priori
-#     curr_data=simDt1_rcpp(K,r,N0,NSwitch,t0)
-#     ats=curr_data$ats
-#     ats[2:length(ats)]=ats[2:length(ats)]+t0
-#     clist=curr_data$clist
-#     tmax=max(ats)
-#     if(tmax>=t1){
-#       # Interpolate for estimate of c at t1
-#       af=approxfun(ats,clist,method="constant")
-#       return(af(t1))	
-#     }else{
-#       # Deterministic simulation from tmax to t1
-#       return(detLog(K,r,NSwitch,t1-tmax))
-#     }
-#   }else{
-#     return(detLog(K,r,N0,t1-t0))
-#   }
-# }
+# Log likelihood of the observation
+dataLik<-function(x,t,y,log=FALSE,...){
+  ll=sum(dnorm(y,x,noiseSD,log=FALSE))
+  if(log)
+    return(ll)
+  else
+    return(exp(ll))
+}
+
+# Prior distribution for X0
+simx0=function(N,t0,...){
+  # returns a matrix whose rows are random samples from the initial distribution
+  return(matrix(sample(calibrated_area[,t0+1],N),nrow=N))
+  # or would it make sense to set these all equal to area_cell?
+}
+
+# Marginal likelihood
+pfMLLik_cpp=function (n, simx0, t0, stepFun, dataLik, data)
+{
+  times = c(t0, as.numeric(rownames(data)))
+  deltas = diff(times)
+  area=data$c
+  return(function(...) {
+    xmat = simx0(n, t0, ...)
+    w=matrix(nrow=n)
+    ll = 0
+    for (i in 1:length(deltas)) {
+      # Replace apply function with for loop to avoid vectorising vectorised function
+      # if statements, seq function and a:b notation don't play nice with vectorisation...
+      rcpp_op=pf_cpp(simx0,10,0,times,deltas,dataLik,stepSim,i,area)
+      xmat=rcpp_op$xmat
+      w=rcpp_op$w
+      if (max(w) < 1e-20) {
+        warning("Particle filter bombed") #WHAT DOES THIS MEAN?
+        return(-1e+99)
+      }
+      ll = ll + log(mean(w))
+      rows = sample(1:n, n, replace = TRUE, prob = w)
+      # Typecast to matrix here, as otherwise 1D matrix gets converted to list...
+      xmat = as.matrix(xmat[rows, ])
+    }
+    ll
+  })
+}
+
+# Marginal likelihood
+pfMLLik=function (n, simx0, t0, stepFun, dataLik, data)
+{
+  times = c(t0, as.numeric(rownames(data)))
+  deltas = diff(times)
+  return(function(...) {
+    xmat = simx0(n, t0, ...)
+    w=matrix(nrow=n)
+    ll = 0
+    for (i in 1:length(deltas)) {
+      # Replace apply function with for loop to avoid vectorising vectorised function
+      # if statements, seq function and a:b notation don't play nice with vectorisation...
+      for(j in 1:n) {
+        xmat[j,]=stepFun(x0=xmat[j,],t0=times[i],deltat=deltas[i],...)
+        w[j]=dataLik(xmat[j,],t=times[i+1],y=data[i,],log=FALSE,...) #likelihood
+      }
+      if (max(w) < 1e-20) {
+        warning("Particle filter bombed") 
+        return(-1e+99)
+      }
+      ll = ll + log(mean(w))
+      rows = sample(1:n, n, replace = TRUE, prob = w)
+      # Typecast to matrix here, as otherwise 1D matrix gets converted to list...
+      xmat = as.matrix(xmat[rows, ])
+    }
+    ll
+  })
+}
+
+# Main MCMC loop
+mcmc = function(p,tune,iters,thin,mLLik,th,pmin,pmax){
+  thmat=matrix(0,nrow=iters,ncol=p)
+  colnames(thmat)=names(th)
+  for (i in 1:iters) {
+    message(paste(i,""),appendLF=FALSE)
+    for (j in 1:thin) {
+      thprob=pmin/2
+      while(sum((thprob<pmin)|(thprob>pmax))>0){
+        # Reject particles outside of range
+        thprob=th*exp(rnorm(p,0,tune))
+      }
+      llprob=mLLik(thprob)
+      if (log(runif(1)) < llprob - ll){
+        th=thprob
+        ll=llprob
+      }
+    }
+    thmat[i,]=th
+  }
+  return(thmat)
+}
 
 ###################################### Main ##############################################################
 
@@ -108,106 +172,71 @@ x=dataset(datsetname)
 area=x$area
 times=x$times
 data=x$data
-
-# Choosing a strain and extracting the data for it
-strain_names=unique(data$genotype)
-pickstrain=strain_names[1]#choose strain here!
-strain=subset_strain(data,area,times,pickstrain)
+data=as.matrix(data)
 
 # Getting the data into the right format
 area_cell=17.25
 calibrated_area=t(apply(area,1, function(x) x/area_cell))
-modelled_data=data.frame(c=calibrated_area[1,],t=t(times[1,]))
-rownames(modelled_data)=times[1,]
+gc=339
+modelled_data=data.frame(c=calibrated_area[gc,],t=t(times[gc,]))
+rownames(modelled_data)=times[gc,]
 modelled_data$t=NULL
-plot(modelled_data$c,as.numeric(rownames(modelled_data)),
+plot(as.numeric(rownames(modelled_data)),modelled_data$c,
      main="Simulated Growth Curve",ylab="Cell Count",xlab="Time (h)",cex.lab=1.4)
+
+# # Plotting all growth curves to choose which ones to model
+# pdf(height = 16, width = 16, file = paste("BayesianInferenceGCs_",datsetname,".pdf",sep=""))
+# par(mfrow=c(4,4))
+# for (i in 1:dim(calibrated_area)[1]){
+#   plot(as.numeric(times[i,]),as.numeric(calibrated_area[i,]),
+#        main=paste(i,data[i,1],data[i,2],data[i,3],data[i,4]),ylab="Cell Count",xlab="Time (h)",cex.lab=1.4,type='l',lty=2)
+#   points(as.numeric(times[i,]),as.numeric(calibrated_area[i,]))
+# }
+# dev.off()
 
 # Using the hybrid simulation but setting the switch much higher than any of the time coure data 
 switchN=1000
+noiseSD=10
 
 # Step Function for pfMLLik
 stepSim=function(x0=1, t0=0, deltat=1, th = c(100,3))  simDt(th[1],th[2],x0,switchN,t0,t0+deltat)
 stepSim_cpp=function(x0=1, t0=0, deltat=1, th = c(100,3))  simDt_cpp(th[1],th[2],x0,switchN,t0,t0+deltat)
+#is this what is making stepSim_cpp really slow? try putting this is cpp as well.... 
 
-# Log likelihood of the observation
-noiseSD=10
-dataLik<-function(x,t,y,log=TRUE,...){
-  ll=sum(dnorm(y,x,noiseSD,log=TRUE))
-  if(log)
-    return(ll)
-  else
-    return(exp(ll))
-}
-
-# Prior distribution for X0
-simx0=function(N,t0,...){
-  # returns a matrix whose rows are random samples from the initial distribution
-  return(matrix(sample(calibrated_area[,t0+1],N),nrow=N))
-  # or would it make sense to set these all equal to area_cell?
-}
-
-# Marginal likelihood
-pfMLLik=function (n, simx0, t0, stepFun, dataLik, data)
-{
-  times = c(t0, as.numeric(rownames(data)))
-  deltas = diff(times)
-  return(function(...) {
-    xmat = simx0(n, t0, ...)
-    w=matrix(nrow=n)
-    ll = 0
-    for (i in 1:length(deltas)) {
-      # Replace apply function with for loop to avoid vectorising vectorised function
-      # if statements, seq function and a:b notation don't play nice with vectorisation...
-      for(j in 1:n) {
-        xmat[j,]=stepFun(x0=xmat[j,],t0=times[i],deltat=deltas[i],...)
-        print(xmat[j,])
-        w[j]=dataLik(xmat[j,],t=times[i+1],y=data[i,],log=FALSE,...)
-      }
-      if (max(w) < 1e-20) {
-        warning("Particle filter bombed") #WHAT DOES THIS MEAN?
-        return(-1e+99)
-      }
-      ll = ll + log(mean(w))
-      rows = sample(1:n, n, replace = TRUE, prob = w)
-      # Typecast to matrix here, as otherwise 1D matrix gets converted to list...
-      xmat = as.matrix(xmat[rows, ])
-    }
-    ll
-  })
-}
-
-mLLik=pfMLLik(10,simx0,0,stepSim_cpp,dataLik,modelled_data)
-
-#Check a best guess in the particle filter
-print(mLLik(th=c(1000,0.2))) #K,r
+mLLik=pfMLLik(10,simx0,0,stepSim,dataLik,modelled_data)
+mLLik_cpp1=pfMLLik(10,simx0,0,stepSim_cpp,dataLik,modelled_data)
+mLLik_cpp2=pfMLLik_cpp(10,simx0,0,stepSim_cpp,dataLik,modelled_data)
 
 # MCMC algorithm
 print(date())
-iters=1000
+iters=100
 tune=0.01
 thin=10
-# Flat priors - change these to uniform priors such that K~(60,1000), r~(0,3)
-th=c(K = 1000, r = 0.2)
+th=c(K=900,r=0.2)
 p=length(th)
 ll=-1e99
-thmat=matrix(0,nrow=iters,ncol=p)
-colnames(thmat)=names(th)
+#Priors
+pmin=c(K=60,r=0)
+pmax=c(K=1000,r=2)
 # Main pMCMC loop
-for (i in 1:iters) {
-  message(paste(i,""),appendLF=FALSE)
-  for (j in 1:thin) {
-    thprop=th*exp(rnorm(p,0,tune))
-    llprop=mLLik(thprop)
-    if (log(runif(1)) < llprop - ll) {
-      th=thprop
-      ll=llprop
-    }
-  }
-  thmat[i,]=th
-}
+thmat=mcmc_cpp(p,tune,iters,thin,mLLik,th,pmin,pmax)
+#thmat=mcmc(p,tune,iters,thin,mLLik,th,pmin,pmax)
 message("Done!")
 print(date())
 # Compute and plot some basic summaries
-mcmcSummary(thmat)
-print(apply(thmat,2,mean))
+print(mcmcSummary(thmat))
+
+# Microbenchmarks
+op1=microbenchmark(pfMLLik(10,simx0,0,stepSim,dataLik,modelled_data),
+                     pfMLLik(10,simx0,0,stepSim_cpp,dataLik,modelled_data),
+                     pfMLLik_cpp(10,simx0,0,stepSim,dataLik,modelled_data),
+                     pfMLLik_cpp(10,simx0,0,stepSim_cpp,dataLik,modelled_data))
+op2=microbenchmark(mcmc(p,tune,iters,thin,mLLik,th,pmin,pmax),
+                     mcmc_cpp(p,tune,iters,thin,mLLik,th,pmin,pmax))
+
+print(op1)
+boxplot(op1,names=c("stepSim","stepSim_cpp","pfMLLik", "pfMLLik_cpp"))
+print(op2)
+boxplot(op2,names=c("mcmc","mcmc_cpp"))
+
+

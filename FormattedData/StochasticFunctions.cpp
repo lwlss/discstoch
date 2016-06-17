@@ -44,14 +44,18 @@ List pf_cpp(Function simx0, int n, int t0,
 }
 
 // [[Rcpp::export]]
-NumericMatrix mcmc_cpp(int p, double tune, int iters, int thin, Function mLLik, NumericVector th){
+NumericMatrix mcmc_cpp(int p, double tune, int iters, int thin, Function mLLik, 
+                       NumericVector th, NumericVector pmin, NumericVector pmax){
   double ll=-1e99;
   NumericMatrix thmat(iters,p);
   for (int i=0; i<iters; i=i+1){
     NumericVector thi=th;
     Rcout << i << " ";
     for(int j=0; j<thin; j=j+1){
-      NumericVector thprob=thi*exp(rnorm(p,0,tune));
+      NumericVector thprob=pmin/2;
+      while(sum((thprob<pmin)|(thprob>pmax))>0){
+        thprob=thi*exp(rnorm(p,0,tune));
+      }
       NumericVector llprob=mLLik(thprob);
       NumericVector pr=log(runif(1));
       if (pr[0]<(llprob[0]-ll)){
