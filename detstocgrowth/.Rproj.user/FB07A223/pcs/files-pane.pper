@@ -1,0 +1,9 @@
+{
+    "path" : "~/detstocgrowth",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}
