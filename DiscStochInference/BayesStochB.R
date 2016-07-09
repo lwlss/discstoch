@@ -50,14 +50,14 @@ library(smfsb)
 ####################################### Functions ########################################################
 
 detLog=function(K,r,c0,t,B=1){
-  return(B*K*c0*exp(r*t)/(K+c0*(exp(r*t)-1)))
+  return(K*c0*exp(B*r*t)/(K+c0*(exp(B*r*t)-1)))
 }
 
 # Hybrid model expressed as number of cells at time t1, after starting at t0
 simDt=function(K=1000,r=1,B=1,N0=1,NSwitch=100,t0=0,t1=1){
   if(NSwitch>N0){
     if(B==0){
-      return(0)
+      return(N0)
     }else{
       # Unusually, for this model, we know the number of events a priori
       eventNo=NSwitch-N0
@@ -228,8 +228,8 @@ calibrated_area=t(apply(area,1, function(x) x/area_cell))
 modelled_data=data.frame(c=calibrated_area[gc,],t=t(times[gc,]))
 rownames(modelled_data)=times[gc,]
 modelled_data$t=NULL
-plot(as.numeric(rownames(modelled_data)),modelled_data$c,
-     main="Simulated Growth Curve",ylab="Cell Count",xlab="Time (h)",cex.lab=1.4)
+# plot(as.numeric(rownames(modelled_data)),modelled_data$c,
+#      main="Simulated Growth Curve",ylab="Cell Count",xlab="Time (h)",cex.lab=1.4)
 
 #print(detstocgrowth::LM_growthrate(modelled_data$c,rownames(modelled_data))$rate)
 
@@ -263,24 +263,24 @@ mLLik=pfMLLik(n,simx0,0,stepSim,dataLik,modelled_data)
 
 # MCMC algorithm
 print(date())
-# iters=100
-# tune=0.01
+# iters=1000
+# tune=0.05
 thin=iters/10
-th=c(r=0.2,dfrac=0.8)
+th=c(r=0.25,dfrac=0.8)
 p=length(th)
 ll=-1e99
 #Priors
 pmin=c(r=0.1,dfrac=0) 
-pmax=c(r=0.6,drafc=1)
+pmax=c(r=0.6,dfrac=1)
 # Main pMCMC loop
 #thmat=mcmc_cpp(p,tune,iters,thin,mLLik,th,pmin,pmax)
 thmat=mcmc(p,tune,iters,thin,mLLik,th,pmin,pmax)
 message("Done!")
 print(date())
 # Compute and plot some basic summaries
-print(mcmcSummary(thmat))
+print(mcmcSummary(thmat,plot=FALSE))
 
-pdf(height = 8, width = 9,file = paste(datsetname,"_Bb0106_Stoch_MCMC_Summary_GC_",gc,"_Iters",iters,"_tune",tune,".pdf",sep=""))
+pdf(height = 8, width = 9,file = paste(datsetname,"_Badj_0106_Stoch_MCMC_Summary_GC",gc,"_Iters",iters,"_tune",tune,".pdf",sep=""))
 #svg(paste("MCMC_Summary_GC",gc,".svg",sep=""),width=7, height=21,pointsize=24)
 mcmcSummary(thmat,show=FALSE,plot=TRUE)
 op=layout(matrix(c(1,1,2,3), 2, 2, byrow = TRUE))
