@@ -163,7 +163,7 @@ mcmc = function(p,tune,iters,thin,mLLik,th,pmin,pmax){
   colnames(thmat)=c(names(th),"B")
   for (i in 1:iters) {
     #message(paste(i,""),appendLF=FALSE)
-    print(i)
+    #print(i)
     if (i%%(iters/10)==0) message(paste(i,date(),"Bb"))
     for (j in 1:thin) {
       thprob=pmin-1
@@ -212,7 +212,7 @@ dataset<-function(x){
 }
 
 # Choosing a data set
-datsetname="Lawless"
+#datsetname="Lawless"
 x=dataset(datsetname)
 area=x$area
 times=x$times
@@ -224,7 +224,7 @@ area=as.matrix(area)
 area_cell=median(area[,1]) #Lawless 92.5
 #area_cell=16.67 #Levy & Ziv
 calibrated_area=t(apply(area,1, function(x) x/area_cell))
-gc=1367
+#gc=1367
 modelled_data=data.frame(c=calibrated_area[gc,],t=t(times[gc,]))
 rownames(modelled_data)=times[gc,]
 modelled_data$t=NULL
@@ -263,8 +263,8 @@ mLLik=pfMLLik(n,simx0,0,stepSim,dataLik,modelled_data)
 
 # MCMC algorithm
 print(date())
-iters=100
-tune=0.01
+# iters=100
+# tune=0.01
 thin=iters/10
 th=c(r=0.2,dfrac=0.8)
 p=length(th)
