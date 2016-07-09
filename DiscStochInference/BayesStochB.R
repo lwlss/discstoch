@@ -83,6 +83,36 @@ simDt=function(K=1000,r=1,B=1,N0=1,NSwitch=100,t0=0,t1=1){
   }
 }
 
+simCellsHybrid=function(K,r,dprob,N0,NSwitch,detpts=100){
+  # Every event produces one cell and consumes one unit of nutrients
+  B=rbinom(1,1,dprob)
+  if(B==0){
+    return(data.frame(t=seq(0,500-1),c=rep(N0,500)))
+  }else{
+    if(NSwitch>N0){
+      # Unusually, for this model, we know the number of events a priori
+      eventNo=NSwitch-N0
+      # So we can just generate all required random numbers (quickly) in one go
+      unifs=runif(eventNo)
+      clist=(N0+1):NSwitch
+      # Time between events
+      dts=-log(unifs)/(r*clist*(1-clist/K))
+      # Absolute times
+      ats=cumsum(dts)
+      tmax=max(ats)
+    }else{
+      clist=c()
+      ats=c()
+      tmax=0
+    }
+    
+    # Switch to discrete deterministic logistic function
+    clistdet=seq(NSwitch+(K-NSwitch)/detpts,K,(K-NSwitch)/detpts)
+    tsdet=log((clistdet*(K - NSwitch))/((K - clistdet)*NSwitch))/r
+    return(data.frame(t=c(0,ats,tmax+tsdet),c=c(N0,c(clist,clistdet))))
+  }
+}
+
 # Log likelihood of the observation
 dataLik<-function(x,t,y,log=FALSE,...){
   ll=sum(dnorm(y,x,noiseSD,log=FALSE))
@@ -159,8 +189,8 @@ pfMLLik=function (n, simx0, t0, stepFun, dataLik, data)
 
 # Main MCMC loop
 mcmc = function(p,tune,iters,thin,mLLik,th,pmin,pmax){
-  thmat=matrix(0,nrow=iters,ncol=p+1)
-  colnames(thmat)=c(names(th),"B")
+  thmat=matrix(0,nrow=iters,ncol=p)
+  colnames(thmat)=c(names(th))
   for (i in 1:iters) {
     #message(paste(i,""),appendLF=FALSE)
     #print(i)
@@ -178,7 +208,7 @@ mcmc = function(p,tune,iters,thin,mLLik,th,pmin,pmax){
         ll=llprob
       }
     }
-    thmat[i,]=c(th,B)
+    thmat[i,]=c(th)
   }
   return(thmat)
 }
@@ -212,7 +242,7 @@ dataset<-function(x){
 }
 
 # Choosing a data set
-#datsetname="Lawless"
+datsetname="Lawless"
 x=dataset(datsetname)
 area=x$area
 times=x$times
@@ -224,7 +254,7 @@ area=as.matrix(area)
 area_cell=median(area[,1]) #Lawless 92.5
 #area_cell=16.67 #Levy & Ziv
 calibrated_area=t(apply(area,1, function(x) x/area_cell))
-#gc=1367
+gc=1367
 modelled_data=data.frame(c=calibrated_area[gc,],t=t(times[gc,]))
 rownames(modelled_data)=times[gc,]
 modelled_data$t=NULL
@@ -263,8 +293,8 @@ mLLik=pfMLLik(n,simx0,0,stepSim,dataLik,modelled_data)
 
 # MCMC algorithm
 print(date())
-# iters=1000
-# tune=0.05
+iters=1000
+tune=0.05
 thin=iters/10
 th=c(r=0.25,dfrac=0.8)
 p=length(th)
@@ -280,23 +310,42 @@ print(date())
 # Compute and plot some basic summaries
 print(mcmcSummary(thmat,plot=FALSE))
 
-pdf(height = 8, width = 9,file = paste(datsetname,"_Badj_0106_Stoch_MCMC_Summary_GC",gc,"_Iters",iters,"_tune",tune,".pdf",sep=""))
+pdf(height = 8, width = 6,file = paste(datsetname,"_Bp_0106_Stoch_MCMC_Summary_GC",gc,"_Iters",iters,"_tune",tune,".pdf",sep=""))
 #svg(paste("MCMC_Summary_GC",gc,".svg",sep=""),width=7, height=21,pointsize=24)
 mcmcSummary(thmat,show=FALSE,plot=TRUE)
 op=layout(matrix(c(1,1,2,3), 2, 2, byrow = TRUE))
 op=par(mfrow=c(2,1))
-plot(as.numeric(times[gc,]),as.numeric(calibrated_area[gc,]),
-     main=paste(gc,data[gc,1],data[gc,2],data[gc,3],data[gc,4]),ylab="Cell Count",xlab="Time (h)",cex.lab=1.4,type='l',lty=2)
-points(as.numeric(times[gc,]),as.numeric(calibrated_area[gc,]))
 curve(dunif(x,pmin[1],pmax[1]),from=pmin[1],to=pmax[1],
       xlab="r (1/h)",ylab="Density",main="Growth Rate",cex.lab=1.5,
       ylim=c(0,max(density(thmat[,1])$y)),lty=2)
 points(density(thmat[,1]),main="",lwd=3,type='l')
 legend("topright",legend=c("Prior","Posterior"),lwd=c(1,3),col=c("black","black"),lty=c(2,1))
+curve(dunif(x,pmin[2],pmax[2]),from=pmin[2],to=pmax[2],
+      xlab="dprob",ylab="Density",main="Probability that Population is made of Dividing Cells",cex.lab=1.5,
+      ylim=c(0,max(density(thmat[,2])$y)),lty=2)
+points(density(thmat[,2]),main="",lwd=3,type='l')
+legend("topright",legend=c("Prior","Posterior"),lwd=c(1,3),col=c("black","black"),lty=c(2,1))
 # curve(dunif(x,pmin[2],pmax[2]),from=pmin[1],to=pmax[1],
 #       main="Carrying Capacity",xlab="K (cells)",ylab="Density",cex.lab=1.5,ylim=c(0,max(density(thmat[,1])$y)),lty=2)
 # points(density(thmat[,1]),main="",lwd=3,type='l')
 # legend("topright",legend=c("Prior","Posterior"),lwd=c(1,3),col=c("black","black"),lty=c(2,1))
+par(op)
+op=par(mfrow=c(3,1))
+# Posterior Predictive
+plot(as.numeric(times[gc,]),as.numeric(calibrated_area[gc,]),
+     main=paste(gc,data[gc,1],data[gc,2],data[gc,3],data[gc,4]),ylab="Cell Count",xlab="Time (h)",cex.lab=1.5,type='l',lty=2)
+points(as.numeric(times[gc,]),as.numeric(calibrated_area[gc,]))
+plot(NULL,ylim=c(0,15000),xlim=c(0,200),xlab="Time (h)",ylab="Cell count", main="Posterior Predictive",cex.lab=1.5)
+for (i in 1:dim(thmat)[1]){
+  pospred=simCellsHybrid(15000,thmat[i,1],thmat[i,2],1,switchN)
+  lines(pospred$t,pospred$c,col=adjustcolor("red",0.5))
+}
+plot(as.numeric(times[gc,]),as.numeric(calibrated_area[gc,]),
+     main="Posterior Predictive Overlay",ylab="Cell Count",xlab="Time (h)",cex.lab=1.5,type='l',lty=1, lwd=3)
+for (i in 1:dim(thmat)[1]){
+  pospred=simCellsHybrid(15000,thmat[i,1],thmat[i,2],1,switchN)
+  lines(pospred$t,pospred$c,col=adjustcolor("red",0.1))
+}
 par(op)
 dev.off()
 
