@@ -3,8 +3,8 @@
 # http://www4.stat.ncsu.edu/~reich/st590/code/regJAGS
 # http://www.r-bloggers.com/parse-arguments-of-an-r-script/
 
-# Command line arguments 
-input <- commandArgs(TRUE) 
+# Command line arguments
+input <- commandArgs(TRUE)
 print(input)
 
 # Print help when no arguments
@@ -20,38 +20,41 @@ if("--help" %in% input) {
       Arguments:
       --arg1=someName              - name of the dataset
       --arg2=someValue:someValue   - which growth curves
+      --arg3=someValue             - 1=logistic, 2=exponential, 3=log-linear,
+                                     4=exponential with B, 5=log-linear with B
       --help                       - prints this text
 
       Example:
       ./test.R --arg1='Lawless' --arg2=1:100
       ")
-  
+
   q(save="no")
 }
+
 ## Parsing input arguments
-parseArgs <- function(x) strsplit(sub("^--", "", x), "=") 
+parseArgs <- function(x) strsplit(sub("^--", "", x), "=")
 inputDF <- as.data.frame(do.call("rbind", parseArgs(input)))
 inputL <- as.list(as.character(inputDF$V2))
 names(inputL) <- inputDF$V1
+datsetname=inputL$arg1
 
 # Original Script
-
 library(rjags)
 library(data.table)
 
 dataset<-function(x){
   if (x == "Lawless"){
     # DataSet1: Lawless
-    area=fread("Lawless_area.txt",header=FALSE)
-    times=fread("Lawless_time.txt",header=FALSE)
-    data=fread("Lawless_data.txt",header=FALSE) #3rd column (Identifier) => strain_parentcolony 
+    area=fread("Lawless_area_shortTC.txt",header=FALSE)
+    times=fread("Lawless_time_shortTC.txt",header=FALSE)
+    data=fread("Lawless_data_shortTC.txt",header=FALSE) #3rd column (Identifier) => strain_parentcolony 
     return(list("area"=area,"data"=data,"times"=times))
   }
   else if (x == "Levy"){
     # DataSet2: Levy
-    area=fread("Levy_area.txt",header=FALSE)
-    times=fread("Levy_time.txt",header=FALSE)
-    data=fread("Levy_data.txt",header=FALSE) #3rd column (Identifier) => replicate
+    area=fread("Levy_area_filtered1.txt",header=FALSE)
+    times=fread("Levy_times_filtered1.txt",header=FALSE)
+    data=fread("Levy_data_filtered1.txt",header=FALSE) #3rd column (Identifier) => replicate
     return(list("area"=area,"data"=data,"times"=times))
   }
   else if (x == "Ziv"){
@@ -64,20 +67,14 @@ dataset<-function(x){
   else {print("Not a valid dataset")}
 }
 
-datsetname=inputL$arg1
-
 # Choosing a data set 
 x=dataset(datsetname)
 area=x$area
 times=x$times
 data=x$data
 
-#Parameters for prior distributions
-intercept=max(area$V1) # this is the maximum value for x0
-kval1=max(area$V23,na.rm=TRUE)
-kval2=min(area$V23,na.rm=TRUE)
-
-modelstring="
+# Logistic Model 
+modelstring1="
 model{
   for (i in 1:n) {
     mu[i]<-(K*x0*exp(r*t[i]))/(K+x0*(exp(r*t[i])-1))
@@ -87,35 +84,114 @@ model{
     pmu[j]<-(K*x0*exp(r*t[j]))/(K+x0*(exp(r*t[j])-1))
     px[j]~dnorm(pmu[j],tau)
   }
-  K~dunif(0,2000000)
+  K~dunif(1110,1392640)
   r~dunif(0,2)
-  x0~dunif(0,2000)
+  x0~dunif(4,300)
   tau~dunif(0,1000)  
 }
 "
 
+# Exponential Model
 modelstring2="
 model{
   for (i in 1:n){
-    mu[i]<-x0*exp(r*t[i])
+    mu[i]=x0*(exp(r*t[i]))
     x[i]~dnorm(mu[i],tau)
   }
   for (j in 1:n) {
-    pmu[j]<-x0*exp(r*t[j])
+    pmu[j]<-x0*(exp(r*t[j]))
     px[j]~dnorm(pmu[j],tau)
   }
   r~dunif(0,2)
-  x0~dunif(0,2000)
+  x0~dunif(4,300)
+  tau~dunif(0,1000)
+}
+"
+# Log-Linear Model 
+modelstring3="
+model{
+  for (i in 1:n){
+    mu[i]=log(x0)+(r*t[i])
+    x[i]~dlnorm(mu[i],tau)
+  }
+  for (j in 1:n) {
+    pmu[j]=log(x0)+(r*t[j])
+    px[j]~dlnorm(pmu[j],tau)
+  }
+  r~dunif(0,2)
+  x0~dunif(4,300)
   tau~dunif(0,1000)  
 }
 "
 
-pdf(height = 16, width = 16, file = paste(datsetname,"_Logistic_Model_Output_",inputL$arg2,".pdf",sep=""))
+# Exponential with B 
+modelstring4="
+model{
+  for (i in 1:n){
+    mu[i]=x0*(exp(B*r*t[i]))
+    x[i]~dnorm(mu[i],tau)
+  }
+  for (j in 1:n) {
+    pmu[j]<-x0*(B*exp(r*t[j]))
+    px[j]~dnorm(pmu[j],tau)
+  }
+  r~dunif(0.1,0.6)
+  x0~dunif(4,300)
+  tau~dunif(0,1000)
+  B~dbern(0.8)
+}
+"
+
+# Log-linear with B 
+modelstring5="
+model{
+  for (i in 1:n){
+    mu[i]=log(x0)+(B*r*t[i])
+    x[i]~dlnorm(mu[i],tau)
+  }
+  for (j in 1:n) {
+    pmu[j]=log(x0)+(B*r*t[j])
+    px[j]~dlnorm(pmu[j],tau)
+  }
+  r~dunif(0.1,0.6)
+  x0~dunif(4,300)
+  tau~dunif(0,1000) 
+  B~dbern(0.8)
+}
+"
+
+if (inputL$arg3==1){
+  name="BayesDetLogist"
+  print(name)
+  model=modelstring1
+  print("Logistic Model")
+} else if (inputL$arg3==2){
+  name="BayesDetExp"
+  print(name)
+  model=modelstring2
+} else if (inputL$arg3==3){
+  name="BayesDetLogLin"
+  print(name)
+  model=modelstring3
+} else if (inputL$arg3==4){
+  name="BayesDetExpB"
+  print(name)
+  model=modelstring4
+} else if (inputL$arg3==5){
+  name="BayesDetLogLinB"
+  print(name)
+  model=modelstring5
+  }else{
+  "Wrong model selection!"
+}
+
+pdf(height = 16, width = 16, file = paste(datsetname,"_",name,"_",inputL$arg2,"_Iters10000000.pdf",sep=""))
 #pdf(height = 16, width = 16, file = paste(datsetname,"_Exponential_Model_Output.pdf",sep=""))
 
 x0_total=c()
 r_total=c()
 k_total=c()
+B_total=c()
 
 growth_curves=strsplit(inputL$arg2,":")
 growth_curves=as.numeric(noquote(growth_curves[[1]][1])):as.numeric(noquote(growth_curves[[1]][2]))
@@ -127,14 +203,22 @@ for (i in growth_curves) { #1:dim(area)[1]
   prednames=sprintf("pmu[%i]",1:N)
   dat=list('x'=as.numeric(area[i,])[vals], 't'=as.numeric(times[i,])[vals], 'n'=N)
   
-  jags<-jags.model(textConnection(modelstring),
+  jags<-jags.model(textConnection(model),
                    data=dat, #names must be those in the JAGS model specification
                    n.chains=4) #how many parallele chains to run
                    #n.adapt=1000) #how many samples to throw away as part of the adaptive sampling period for each chain
-  update(jags,1000000) #Burn-in period
+  update(jags,10000000)
   
-  samples=coda.samples(model=jags,variable.names=c('r','x0','tau','K', prednames),n.iter=1000000,thin=1000)
-  subset=samples[,c("r","K","x0","tau")]
+  if (inputL$arg3==1){
+    samples=coda.samples(model=jags,variable.names=c('r','x0','tau','K', prednames),n.iter=100000,thin=100)
+    subset=samples[,c("r","K","x0","tau")]
+  } else if (inputL$arg3==2|inputL$arg3==3){
+    samples=coda.samples(model=jags,variable.names=c('r','x0','tau', prednames),n.iter=100000,thin=100)
+    subset=samples[,c("r","x0","tau")]
+  } else if (inputL$arg3==4|inputL$arg3==5){
+    samples=coda.samples(model=jags,variable.names=c('r','x0','tau','B', prednames),n.iter=100000,thin=100)
+    subset=samples[,c("r","x0","tau",'B')]
+  }
   
   # samples=coda.samples(model=jags,variable.names=c('r','x0','tau', prednames),n.iter=1000000,thin=1000)
   # subset=samples[,c("r","x0","tau")]
@@ -147,13 +231,27 @@ for (i in growth_curves) { #1:dim(area)[1]
   #op=layout(matrix(c(1,1,2,3), 2, 2, byrow = TRUE))
   
   #Plot the Growth Curve 
-  plot(as.numeric(times[i,])[vals],as.numeric(area[i,])[vals],type='l',xlab="Time",ylab="Area",lty=3, main=paste("Growth Curve",i))
-  points(as.numeric(times[i,])[vals],as.numeric(area[i,])[vals],type='p',pch=16)
   #Overlaying the Posterior Predictive 
-  preds=samples[[1]][,prednames]
-  lines(as.numeric(times[i,])[vals],apply(preds,2,mean),type="l",col="red",ylim=c(0,1000),xlab="Time",ylab="Population Size",main="Posterior predictive")
-  points(as.numeric(times[i,])[vals],apply(preds,2,quantile,0.05),type="l",lty=3,col="red")
-  points(as.numeric(times[i,])[vals],apply(preds,2,quantile,0.95),type="l",lty=3,col="red")
+  if (inputL$arg3==3|inputL$arg3==5){
+    plot(as.numeric(times[i,])[vals],log(as.numeric(area[i,])[vals]),type='l',xlab="Time",ylab="log(Area)",lty=3, 
+         main=paste("Growth Curve",i),cex.lab=1.5)
+    points(as.numeric(times[i,])[vals],log(as.numeric(area[i,])[vals]),type='p',pch=16)
+    preds=samples[[1]][,prednames]
+    lines(as.numeric(times[i,])[vals],apply(preds,2,mean),type="l",col="red",ylim=c(0,1000),xlab="Time",ylab="Population Size",
+          main="Posterior predictive")
+    points(as.numeric(times[i,])[vals],apply(preds,2,quantile,0.05),type="l",lty=3,col="red")
+    points(as.numeric(times[i,])[vals],apply(preds,2,quantile,0.95),type="l",lty=3,col="red")
+  } else{
+    plot(as.numeric(times[i,])[vals],as.numeric(area[i,])[vals],type='l',xlab="Time",ylab="log(Area)",lty=3, 
+         main=paste("Growth Curve",i),cex.lab=1.5)
+    points(as.numeric(times[i,])[vals],as.numeric(area[i,])[vals],type='p',pch=16)
+    preds=samples[[1]][,prednames]
+    lines(as.numeric(times[i,])[vals],apply(preds,2,mean),type="l",col="red",ylim=c(0,1000),xlab="Time",ylab="Population Size",
+          main="Posterior predictive")
+    points(as.numeric(times[i,])[vals],apply(preds,2,quantile,0.05),type="l",lty=3,col="red")
+    points(as.numeric(times[i,])[vals],apply(preds,2,quantile,0.95),type="l",lty=3,col="red")
+  }
+
   
   #Posterior Distribution for Growth Rate, r
   m_r=summary(samples)[[1]]['r',1]
@@ -165,27 +263,50 @@ for (i in growth_curves) { #1:dim(area)[1]
   #Posterior Distribution for Intercept, x0
   m_x0=summary(samples)[[1]]['x0',1]
   print(paste("Mean of x0 is", m_x0))
-  curve(dunif(x,0,2000),from=0,to=2000,main=paste("Intercept, x0; Mean:",signif(m_x0,3)),ylim=c(0,max(density(samples[[1]][,"x0"])$y)))
+  curve(dunif(x,4,300),from=4,to=300,main=paste("Intercept, x0; Mean:",signif(m_x0,3)),ylim=c(0,max(density(samples[[1]][,"x0"])$y)))
   points(density(samples[[1]][,"x0"]),type="l",col="blue")
   abline(v=m_x0,col="black",lty=3)
   
   #Posterior Distribution for Carrying Capacity, K
-  m_k=summary(samples)[[1]]['K',1]
-  print(paste("Mean of k is", m_k))
-  curve(dunif(x,0,2000000),from=0,to=2000000,main=paste("Carrying Capacity, K; Mean:",signif(m_k,3)),ylim=c(0,max(density(samples[[1]][,"K"])$y)))
-  points(density(samples[[1]][,"K"]),type="l",col="blue")
-  abline(v=m_k,col="black",lty=3)
+  if (inputL$arg3==1){
+    m_k=summary(samples)[[1]]['K',1]
+    print(paste("Mean of k is", m_k))
+    curve(dunif(x,1110,70000),from=1110,to=70000,main=paste("Carrying Capacity, K; Mean:",signif(m_k,3)),ylim=c(0,max(density(samples[[1]][,"K"])$y)))
+    points(density(samples[[1]][,"K"]),type="l",col="blue")
+    abline(v=m_k,col="black",lty=3)
+    k_total=k_total=c(k_total,m_k)
+  }
+  
+  #Posterior Distribution for Dividing Cells, B
+  if (inputL$arg3==4|inputL$arg3==5){
+    m_B=summary(samples)[[1]]['B',1]
+    print(paste("Mean of B is", m_B))
+    curve(dunif(x,0,1),from=0,to=1,main=paste("Dividing Cells, B; Mean:",signif(m_B,3)),ylim=c(0,max(density(samples[[1]][,"B"])$y)))
+    points(density(samples[[1]][,"B"]),type="l",col="blue")
+    abline(v=m_k,col="black",lty=3)
+    B_total=k_total=c(B_total,m_B)
+  }
   
   par(op)
-
   x0_total=c(x0_total,m_x0)
   r_total=c(r_total,m_r)
-  k_total=k_total=c(k_total,m_k)
 
 }
 
 dev.off()
 
-Bayes_parameters=data.frame("Intercept"=x0_total,"Rate"=r_total,"CarryingCapacity"=k_total)
-filename=paste(datsetname,"_Bayes_parameters_",inputL$arg2,".txt",sep="")
+if (inputL$arg3==1){
+  Bayes_parameters=data.frame("Intercept"=x0_total,"Rate"=r_total,"CarryingCapacity"=k_total)
+} else if (inputL$arg3==2|input$arg3==3){
+  Bayes_parameters=data.frame("Intercept"=x0_total,"Rate"=r_total)
+} else if (inputL$arg3==4|inputL$arg3==5){
+  Bayes_parameters=data.frame("Intercept"=x0_total,"Rate"=r_total,"DividingCells"=B_total)
+}
+filename=paste(datsetname,"_Bayes_parameters_",name,"_",inputL$arg2,".txt",sep="")
 write.table(Bayes_parameters,filename,col.names=TRUE,row.names=FALSE)
+
+# blobN0=c()
+# for (i in unique(data$V2)){
+#   blobN0=c(blobN0,length(which(i==data$V2)))
+# }
+# print(min(blobN0))
