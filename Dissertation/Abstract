@@ -1,0 +1,45 @@
+\documentclass[a4paper]{article}
+
+\usepackage{fullpage} 
+\usepackage{parskip} 
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{lipsum}
+
+\title{MSc Dissertation - Draft 1 \\~\\ Modeling Heterogeneity in Microbial Population Dynamics}
+\author{Helena Herrmann}
+\date{\today}
+
+
+\begin{document}
+
+\maketitle
+
+\section*{Abstract}
+
+\textbf{Chapter 1} 
+Fast-growing lineages dominate observed microbial population growth. However, when using growth rate as a measure of strain fitness inherent growth rate heterogeneities form a key at attributes of a strain's phenotype, in particular when considering populations where slow-growing sub-populations destine the evolutionary development of a population. Quantification of selective dominance of fast-growing strains at the single-lineage level of two published,  high-throughput microscopy assay \textit{Saccharomyces cerevisiae} data sets, \cite{Levy12,Ziv13}, has led to new mechanistic insight at the population level with discerning experimental design implications. The research presented below simulates the extent to which heterogeneity of single-lineage growth rates influences population behavior and demonstrates how an apparent lag phase can arise at the population level without being present at the single-lineage level.
+
+\textbf{Chapter 2}
+In order to validate and further explore the extent of the above conclusions, single-lineage microscopy data of \textit{S.cerevisiae} were generated using in-house micro Quantitative Fitness Analyses ($\mu$QFA) techniques. Complementary to the above analyzed data sets, the newly obtained $\mu$QFA data provided the added benefit of access to untrimmed raw data, including fast-growing outliers as well as non-dividing cells, all of which influence the extent of the lag phase at the population level. Given the immoderate effect with which growth rate heterogeneity at the single-lineage level estimated through modeling influences the behavior of a simulated population, various model options for parameter inference were explored. 
+
+\section{Isogenic growth rate heterogeneity and how population-level observations fail to capture it.}
+
+\section{$\mu$QFA data confirms a population lag phase as a result of growth rate heterogeneity and is used to explore available growth rate inference techniques.}
+
+\begin{thebibliography}{}
+\bibitem[1]{Levy12} Levy,S.F., Ziv,N., Siegal,M.L. (2012) Bet hedging in yeast by heterogeneous, age-correlated expression of a stress protectant. {\it PLoS Biol.}, {\bf 10}, e1001325.
+\bibitem[2]{Ziv13}Ziv,N., Siegal,M.L., Gresham,D. (2013) Genetic and nongenetic determinants of cell growth variation assessed by high-throughput microscopy. {\it Mol. Biol. Evol.}, {\bf 30}, 2568–2578. 
+
+\end{thebibliography}{}
+
+
+
+\end{document}
