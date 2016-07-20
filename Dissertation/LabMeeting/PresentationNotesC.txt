@@ -1,0 +1,21 @@
+cells on solid agar 
+slides 1 and 4 from video
+high throughput microscopy 
+
+highlight features in population distribution: bimodal 
+novel phenotype that people normally dont have access to is non-dividing cells
+both distributions have a long right tail; left is truncated 
+usually picture sharp unimodial distribution but this data shows differently: 
+1) mode 2) width 3) length 
+
+Simulating a mixed population: put in the equations 
+
+Population Simulations; heterogeneity give rise to apparent lag phase 
+-curves are synthetic (simulated) 
+-growth rate distributions are real 
+
+Consequences of hetergoneity 
+
+barcoding libraries of yeast strains; barcoding experiment would mimic fish plots 
+competition experiment simulation 
+go from mixed to almost clonal population in almost 2 days
