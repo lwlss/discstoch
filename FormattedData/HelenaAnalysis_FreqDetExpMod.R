@@ -6,201 +6,245 @@ library(detstocgrowth)
 library(fishplot)
 library(MASS)
 library(bcp)
+library(segmented)
 
-dataset<-function(x){
-  if (x == "Lawless"){
-    # DataSet1: Lawless
-    area=fread("Lawless_area_shortTC.txt",header=FALSE)
-    times=fread("Lawless_time_shortTC.txt",header=FALSE)
-    data=fread("Lawless_data_shortTC.txt",header=FALSE) #3rd column (Identifier) => strain_parentcolony
-    names(data)=c("genotype","clonalcolony","identifier","blobnumber")
-    return(list("area"=area,"data"=data,"times"=times,"residuals"=residuals))
+for (z in 1:16){
+  dataset<-function(x){
+    if (x == "Lawless"){
+      # DataSet1: Lawless
+      area=fread("Lawless_area_shortTC.txt",header=FALSE)
+      times=fread("Lawless_time_shortTC.txt",header=FALSE)
+      data=fread("Lawless_data_shortTC.txt",header=FALSE) #3rd column (Identifier) => strain_parentcolony
+      info=read.table("Lawless_GrowthRateInfo.txt",header=TRUE,row.names=1)
+      names(data)=c("genotype","clonalcolony","identifier","blobnumber")
+      return(list("area"=area,"data"=data,"times"=times,"info"=info))
+    }
+    else if (x == "Levy"){
+      # DataSet2: Levy
+      area=fread("Levy_area_filtered.txt",header=FALSE)
+      times=fread("Levy_times_filtered.txt",header=FALSE)
+      data=fread("Levy_data_filtered.txt",header=TRUE) #3rd column (Identifier) => replicate
+      info=read.table("Levy_GrowthRateInfo.txt",header=TRUE,row.names=1)
+      return(list("area"=area,"data"=data,"times"=times,"info"=info))
+    }
+    else if (x == "Ziv"){
+      # DataSet3: Ziv
+      area=fread("Ziv_area_filtered1.txt",header=FALSE)
+      times=fread("Ziv_times_filtered1.txt",header=FALSE)
+      data=fread("Ziv_data_filtered1.txt",header=TRUE) #3rd column (Identifier) => colony
+      info=read.table("Ziv_GrowthRateInfo.txt",header=TRUE,row.names=1)
+      return(list("area"=area,"data"=data,"times"=times,"info"=info))
+    }
+    else {print("Not a valid dataset")}
   }
-  else if (x == "Levy"){
-    # DataSet2: Levy
-    area=fread("Levy_area_filtered.txt",header=FALSE)
-    times=fread("Levy_times_filtered.txt",header=FALSE)
-    data=fread("Levy_data_filtered.txt",header=TRUE) #3rd column (Identifier) => replicate
-    return(list("area"=area,"data"=data,"times"=times,"residuals"=residuals))
+  
+  # Choosing a data set
+  datsetname="Lawless"
+  x=dataset(datsetname)
+  area=x$area
+  times=x$times
+  data=x$data
+  info=x$info
+  
+  # Which model to use
+  
+  #print(mean(info$Rsquared))
+  length(which(info$Prob>0.5))
+  unique(data[which(info$Prob>0.5)]$genotype)
+  
+  # Choosing a strain and extracting the data for it
+  strain_names=unique(data$genotype)
+  #print(strain_names)
+  pickstrain=strain_names[z] #choose strain here!
+  strain=detstocgrowth::subset_strain(data,area,times,pickstrain)
+  #detstocgrowth::plot_growth(strain$area,strain$times,strain$name,Nsample=50,title=TRUE,hist=TRUE) #dim(strain$area)[1]
+  
+  #Calculating the estimated growth rates for all growth curves of the strain
+  strain_rates=c()
+  strain_int=c()
+  dist=c()
+  for (i in 1:dim(strain$area)[1]){
+    k=detstocgrowth::LM_growthrate(strain$area[i,],strain$times[i,])$rate
+    intercept=detstocgrowth::LM_growthrate(as.numeric(strain$area[i,]),as.numeric(strain$times[i,]))$int
+    fit=detstocgrowth::LM_growthrate(as.numeric(strain$area[i,]),as.numeric(strain$times[i,]))$fit
+    res=residuals(fit)
+    dist=c(dist,range(res)[1]-range(res)[2])
+    strain_rates=c(strain_rates,k)
+    strain_int=c(strain_int,intercept)
   }
-  else if (x == "Ziv"){
-    # DataSet3: Ziv
-    area=fread("Ziv_area_filtered1.txt",header=FALSE)
-    times=fread("Ziv_times_filtered1.txt",header=FALSE)
-    data=fread("Ziv_data_filtered1.txt",header=TRUE) #3rd column (Identifier) => colony
-    return(list("area"=area,"data"=data,"times"=times,"residuals"=residuals))
+  
+  #Setting growth rates <0 equal to 0
+  strain_rates[which(strain_rates<0)]=0
+  
+  # FishPlot using data simulated from the growth rates over a longer time course and a
+  # starting population of a single cell
+  
+  # # ######################################################
+  # t=seq(1,48,1)
+  # iter=1000
+  # N0=100
+  # ds=matrix(0,nrow=iter,ncol=length(t))
+  # fs=matrix(0,nrow=iter,ncol=length(t))
+  # for(j in 1:iter){
+  #   print(j)
+  #   # sample_rates=sample(strain_rates,N0-2,replace=TRUE)
+  #   # sample_rates=c(max(strain_rates),sample_rates,0)
+  #   sample_rates=sample(strain_rates,N0,replace=TRUE)
+  #   fid=c(which(sample_rates==max(sample_rates)))
+  #   sim_area=matrix(0,ncol=length(t),nrow=length(sample_rates))
+  #   for (i in 1:length(sample_rates)){
+  #     sim_area[i,]=round(detstocgrowth::simExponential(sample_rates[i],t))
+  #   }
+  #   pop_data=colSums(sim_area)
+  #   frac.table=matrix(0,nrow=dim(sim_area)[1],ncol=length(t))
+  #   for (i in 1:dim(sim_area)[1]){
+  #     frac.table[i,]=as.numeric(sim_area[i,])/as.numeric(pop_data)
+  #   }
+  #   frac.table=frac.table*100
+  #   ds[j,]=apply(frac.table,2,function(x) sum(x>5))
+  #   if(length(fid)>1){
+  #     fs[j,]=colSums(frac.table[fid,])
+  #   }else{fs[j,]=frac.table[fid,]}
+  # }
+  # 
+  # print(apply(ds,2,mean))
+  # print(apply(fs,2,mean))
+  # 
+  # 
+  #######################################################
+  fishfun<-function(t,sample_rates){
+    sim_area=matrix(0,ncol=length(t),nrow=length(sample_rates))
+    for (i in 1:length(sample_rates)){
+      sim_area[i,]=round(detstocgrowth::simExponential(sample_rates[i],t))
+    }
+    pop_data=colSums(sim_area)
+    frac.table=matrix(0,nrow=dim(sim_area)[1],ncol=length(t))
+    for (i in 1:dim(sim_area)[1]){
+      frac.table[i,]=as.numeric(sim_area[i,])/as.numeric(pop_data)
+    }
+    frac.table=frac.table*100
+    frac.table=floor(frac.table*100000)/100000 #need to round this down otherwise creatFishObjct() gives error
+    #parents=rep(0,dim(sim_area)[1])
+    parents=rep(0,length(sample_rates))
+    colours=rainbow(11)
+    gr_range=seq(0.05,0.55,0.05)
+    ids=sapply(sample_rates,function(x) which(abs(gr_range-x)==min(abs(gr_range-x))))
+    col_list=colours[ids]
+    # col_list=rep(adjustcolor("yellow",0.3),length(sample_rates))
+    max_col=colours[sort(unique(ids),decreasing=TRUE)[1:3]]
+    max_strains=sort(unique(sample_rates),decreasing=TRUE)[1:3]
+    # for (i in 1:3){
+    #   colours[which(sample_rates==max_strains[i])]=max_col[i]
+    # }
+    fish = fishplot::createFishObject(frac.table,parents,timepoints=t,col=col_list)
+    fish = fishplot::layoutClones(fish)
+    fishplot::fishPlot(fish,shape="spline",title.btm=paste(strain$name),
+                       cex.title=1, vlines=c(0,max(t)),
+                       vlab=c("1h",paste(max(t),"h",sep="")))
+    legend("topleft",legend=signif(max_strains,2),col=max_col,lty=c(1,1,1),lwd=c(3,3,3))
   }
-  else {print("Not a valid dataset")}
-}
-
-# Choosing a data set
-datsetname="Lawless"
-x=dataset(datsetname)
-area=x$area
-times=x$times
-data=x$data
-
-# Choosing a strain and extracting the data for it
-strain_names=unique(data$genotype)
-print(strain_names)
-pickstrain=strain_names[2] #choose strain here!
-strain=detstocgrowth::subset_strain(data,area,times,pickstrain)
-detstocgrowth::plot_growth(strain$area,strain$times,strain$name,Nsample=dim(strain$area)[1],title=TRUE,hist=TRUE)
-
-#Calculating the estimated growth rates for all growth curves of the strain
-strain_rates=c()
-strain_int=c()
-dist=c()
-for (i in 1:dim(strain$area)[1]){
-  k=detstocgrowth::LM_growthrate(strain$area[i,],strain$times[i,])$rate
-  intercept=detstocgrowth::LM_growthrate(as.numeric(strain$area[i,]),as.numeric(strain$times[i,]))$int
-  fit=detstocgrowth::LM_growthrate(as.numeric(strain$area[i,]),as.numeric(strain$times[i,]))$fit
-  res=residuals(fit)
-  dist=c(dist,range(res)[1]-range(res)[2])
-  strain_rates=c(strain_rates,k)
-  strain_int=c(strain_int,intercept)
-}
-
-#Setting growth rates <0 equal to 0
-strain_rates[which(strain_rates<0)]=0
-
-# FishPlot using data simulated from the growth rates over a longer time course and a
-# starting population of a single cell
-
-# ######################################################
-# t=seq(1,48,1)
-# iter=10000
-# N0=1000
-# ds=matrix(0,nrow=iter,ncol=length(t))
-# fs=matrix(0,nrow=iter,ncol=length(t))
-# fr=c()
-# for(j in 1:iter){
-#   # sample_rates=sample(strain_rates,N0-2,replace=TRUE)
-#   # sample_rates=c(max(strain_rates),sample_rates,0)
-#   sample_rates=sample(strain_rates,N0,replace=TRUE)
-#   fr=c(fr,sum(sample_rates>0.475))
-#   fid=c(which(sample_rates==max(sample_rates)))
-#   sim_area=matrix(0,ncol=length(t),nrow=length(sample_rates))
-#   for (i in 1:length(sample_rates)){
-#     sim_area[i,]=round(detstocgrowth::simExponential(sample_rates[i],t))
-#   }
-#   pop_data=colSums(sim_area)
-#   frac.table=matrix(0,nrow=dim(sim_area)[1],ncol=length(t))
-#   for (i in 1:dim(sim_area)[1]){
-#     frac.table[i,]=as.numeric(sim_area[i,])/as.numeric(pop_data)
-#   }
-#   frac.table=frac.table*100
-#   ds[j,]=apply(frac.table,2,function(x) sum(x>5))
-#   if(length(fid)>1){
-#     fs[j,]=colSums(frac.table[fid,])
-#   }else{fs[j,]=frac.table[fid,]}
-# }
-# 
-# print(apply(ds,2,mean))
-# print(apply(fs,2,mean))
-# print(mean(fr))
-
-#######################################################
-# fishfun<-function(t,sample_rates){
-#   sim_area=matrix(0,ncol=length(t),nrow=length(sample_rates))
-#   for (i in 1:length(sample_rates)){
-#     sim_area[i,]=round(detstocgrowth::simExponential(sample_rates[i],t))
-#   }
-#   pop_data=colSums(sim_area)
-#   frac.table=matrix(0,nrow=dim(sim_area)[1],ncol=length(t))
-#   for (i in 1:dim(sim_area)[1]){
-#     frac.table[i,]=as.numeric(sim_area[i,])/as.numeric(pop_data)
-#   }
-#   frac.table=frac.table*100
-#   frac.table=floor(frac.table*100000)/100000 #need to round this down otherwise creatFishObjct() gives error
-#   #parents=rep(0,dim(sim_area)[1])
-#   parents=rep(0,length(sample_rates))
-#   colours=rep("yellow",length(sample_rates))
-#   max_col=c("red","blue","green")
-#   max_strains=sort(unique(sample_rates),decreasing=TRUE)[1:3]
-#   for (i in 1:3){
-#     colours[which(sample_rates==max_strains[i])]=max_col[i]
-#   }
-#   fish = fishplot::createFishObject(frac.table,parents,timepoints=t,col=colours)
-#   fish = fishplot::layoutClones(fish)
-#   fishplot::fishPlot(fish,shape="spline",title.btm=paste(strain$name),
-#                      cex.title=1, vlines=c(0,max(t)),
-#                      vlab=c("1h","48h"))
-#   legend("topleft",legend=signif(max_strains,2),col=max_col,lty=c(1,1,1),lwd=c(3,3,3))
-# }
-# # sample_rates=sample(strain_rates,8)
-# # sample_rates=c(max(strain_rates),sample_rates,0,replace=TRUE)
-# # Simulating growth curves using the above rates
-# t=seq(1,48,1)
-# op=par(mfrow=c(3,1))
-# sample_rates=sample(strain_rates,10000,replace=TRUE)
-# fishfun(t,sample_rates)
-# sample_rates=sample(strain_rates,1000,replace=TRUE)
-# fishfun(t,sample_rates)
-# sample_rates=sample(strain_rates,100,replace=TRUE)
-# fishfun(t,sample_rates)
-# mtext(toString(strain$name), outer = TRUE, cex = 1.5)
-# par(op)
-#title(paste("Simulated FishPlots",datsetname,strain$name))
-
-# Using 100 growth curves for extrapolation
-total=dim(strain$area)[1]
-N=100
-time=seq(0,35,0.5)
-
-# Using 100 growth curves for extrapolation
-total=dim(strain$area)[1]
-N=100
-time=seq(0,35,0.5)
-
-# Refitting the exponential model to the newly simulated data to obtain
-# population growth rate
-iterations=1000
-popsim=pop_sim_dat(strain,strain_rates,N,time,iterations)
-popdata=popsim$PopData
-poprate=popsim$SimRates
-
-pop_rates=c()
-for (i in 1:dim(popdata)[1]){
-  k=detstocgrowth::LM_growthrate(as.numeric(popdata[i,15:35]),time)$rate
-  pop_rates=c(pop_rates,k)
-}
-
-op=par(mfrow=c(2,1))
-plot(1,type='n', xlim=range(time), ylim=range(popdata),xlab="Time (h)",ylab="No. of Cells",log='y',cex.lab=1.4)
-colours=rainbow(10)
-# colours=colours[-1]
-# colours=colours[-1]
-gr_range=seq(0.05,0.5,0.05)
-#gr_range=seq(0.05,0.4,0.05)
-bp_pr=c()
-bp_loc=c()
-for (i in 1:iterations){
-  #print((i*100-99)); print((i*100-100+N))
-  id=which(abs(gr_range-max(poprate[(i*100-99):(i*100-100+N)]))==min(abs(gr_range-max(poprate[(i*100-99):(i*100-100+N)]))))
-  lines(time,popdata[i,],col=colours[id],lwd=2)
-  if(max(poprate[(i*100-99):(i*100-100+N)])>0.3){ #0.45
+  # sample_rates=sample(strain_rates,8)
+  # sample_rates=c(max(strain_rates),sample_rates,0,replace=TRUE)
+  # Simulating growth curves using the above rates
+  #t=seq(1,96,1)
+  t=seq(1,48,1)
+  op=par(mfrow=c(3,1))
+  sample_rates=sample(strain_rates,10000,replace=TRUE)
+  fishfun(t,sample_rates)
+  sample_rates=sample(strain_rates,1000,replace=TRUE)
+  fishfun(t,sample_rates)
+  sample_rates=sample(strain_rates,100,replace=TRUE)
+  fishfun(t,sample_rates)
+  mtext(toString(strain$name), outer = TRUE, cex = 1.5)
+  par(op)
+  title(paste("Simulated FishPlots",datsetname,strain$name))
+  
+  
+  # Using 100 growth curves for extrapolation
+  total=dim(strain$area)[1]
+  N=100
+  #time=seq(0,96,0.5)
+  time=seq(0,35,0.5)
+  
+  # Refitting the exponential model to the newly simulated data to obtain
+  # population growth rate
+  iterations=1000
+  popsim=pop_sim_dat(strain,strain_rates,N,time,iterations)
+  popdata=popsim$PopData
+  poprate=popsim$SimRates
+  
+  png(paste(paste(datsetname,"_PopSimCol",pickstrain,"_N100_It1000",sep="_"),".png",sep=""))
+  op=par(mfrow=c(2,1))
+  plot(1,type='n', xlim=range(time), ylim=range(popdata),xlab="Time (h)",ylab="log(No. of Cells)",log='y',cex.lab=1.4)
+  #colours<-colorRampPalette(c("brown","pink","red", "yellow", "green", "darkgreen","blue","cyan","purple"))(n = 16)
+  colours=rainbow(12)
+  # colours=colours[-1]
+  # colours=colours[-1]
+  #gr_range=seq(0.05,0.8,0.05)
+  gr_range=seq(0.05,0.6,0.05)
+  bp_pr=c()
+  bp_loc=c()
+  pop_rates=c()
+  pop_rates_lag=c()
+  for (i in 1:iterations){
+    print(i)
+    #print((i*100-99)); print((i*100-100+N))
+    id=which(abs(gr_range-max(poprate[(i*100-99):(i*100-100+N)]))==min(abs(gr_range-max(poprate[(i*100-99):(i*100-100+N)]))))
+    lines(time,popdata[i,],col=colours[id],lwd=2)
     op_bcp=bcp(log(popdata[i,]),time)
-    max_prob=max(op_bcp$posterior.prob,na.rm=TRUE)
-    breakpoint_location=which(op_bcp$posterior.prob==max_prob)
+    max_prob=max(op_bcp[8]$posterior.prob,na.rm=TRUE)
+    breakpoint_location=which(op_bcp[8]$posterior.prob==max_prob)[1]
     bp_pr=c(bp_pr,max_prob)
     bp_loc=c(bp_loc,breakpoint_location)
+    if (max_prob>0.5){
+      area=log(popdata[i,])
+      t=time
+      linmod=lm(area~t)
+      segmod=try(segmented(linmod,seg.Z =~t,psi=breakpoint_location),silent=TRUE)
+      if (typeof(segmod)[1]=="list"){
+        k=slope(segmod)$t[,1][2]
+        klag=slope(segmod)$t[,1][1]
+      }
+      else{
+        k=detstocgrowth::LM_growthrate(as.numeric(popdata[i,]),time)$rate
+        klag=NA
+      }
+    }else{
+      k=detstocgrowth::LM_growthrate(as.numeric(popdata[i,]),time)$rate
+      klag=NA
+    }
+    pop_rates=c(pop_rates,k)
+    pop_rates_lag=c(pop_rates_lag,klag)
   }
+  print(pickstrain)
+  print(mean(bp_pr))
+  print(min(bp_pr))
+  print(time[mean(bp_loc)])
+  print(mean(pop_rates))
+  print(mean(pop_rates[-which(is.na(pop_rates_lag))]))
+  print(mean(pop_rates_lag,na.rm=TRUE))
+  tt=t.test(pop_rates[-which(is.na(pop_rates_lag))],pop_rates_lag[-which(is.na(pop_rates_lag))],conf.level=0.99)
+  print(tt$p.value)
+  colid=which(abs(rev(gr_range)-max(poprate))==min(abs(rev(gr_range)-max(poprate))))
+  #legend("topleft",title="Max. Growth Rate",legend=rev(gr_range)[1:3],col=rev(colours)[1:3],lty=rep(1,3),lwd=rep(3,3))
+  legend("topleft",title="Max. Growth Rate",legend=rev(gr_range)[colid:(colid+2)],col=rev(colours)[colid:(colid+2)],lty=rep(1,6),lwd=rep(3,6))
+  
+  #detstocgrowth::pop_plot_growth(popdata,time,strain$name,title=TRUE,hist=FALSE)
+  #detstocgrowth::histo(strain_rates,strain$name,c=seq(0,0.4,0.01),SE=FALSE)
+  #box()
+  h=hist(strain_rates,breaks=seq(0,0.8,0.01),plot=FALSE)
+  hcol=colours[sapply(h$mids, function(x) which(abs(gr_range-x)==min(abs(gr_range-x)))[1])]
+  plot(h,col=hcol,cex.lab=1.4)
+  #abline(v=mean(strain_rates),col="red",lwd=3)
+  abline(v=mean(poprate),col="black",lwd=3)
+  abline(v=mean(pop_rates),col="black",lwd=3,lty=2)
+  legend("topright",legend=c("True Mean","Pop'n Mean"),col=c("black","black"),lty=c(1,2),lwd=c(3,3))
+  par(op)
+  dev.off()
 }
-print(mean(bp_pr))
-print(min(bp_pr))
-print(time[mean(bp_loc)])
-legend("topleft",title="Max. Growth Rate",legend=rev(gr_range)[1:6],col=rev(colours)[1:6],lty=rep(1,6),lwd=rep(3,6))
-#legend("topleft",title="Max. Growth Rate",legend=rev(gr_range)[1:5],col=rev(colours)[1:5],lty=rep(1,6),lwd=rep(3,6))
 
-#detstocgrowth::pop_plot_growth(popdata,time,strain$name,title=TRUE,hist=FALSE)
-detstocgrowth::histo(strain_rates,strain$name,SE=FALSE)
-box()
-#abline(v=mean(strain_rates),col="red",lwd=3)
-abline(v=mean(poprate),col="black",lwd=3)
-abline(v=mean(pop_rates),col="#0066FFFF",lwd=3)
-legend("topright",legend=c("True Mean","Pop'n Mean"),col=c("black","#0066FFFF"),lty=c(1,1),lwd=c(3,3))
-par(op)
+
+
 #Note indices for all iterations!
 popdata_indices=popsim$indices
 
@@ -225,7 +269,7 @@ popdata_indices=popsim$indices
 # Changes in variance & value of growth rate estimates with an inceasing
 # size of the starting population
 #N=dim(strain$area)[1]
-N=10000
+N=1000
 iterations=1000
 # total_popsim=detstocgrowth::pop_sim_dat(strain,strain_rates,N,time,iterations)
 # simdata=total_popsim$SimData
@@ -281,7 +325,7 @@ variance[which(variance==0)]=NA
 #http://www.r-bloggers.com/r-single-plot-with-two-different-y-axes/
 png(paste(paste("Final_PopSimDat",datsetname,strain$name,signif(true_mean,3),signif(true_variance,3),"IT100(2)",sep="_"),".png",sep=""))
 par(mar=c(5,5,2,5))
-plot(NULL,xlim=range(init_pop),ylim=range(poprates),ylab="Growth Rate (1/h)",xlab="Initial Population Size (No. of cells)",cex.lab=1.4,cex.main=1.2)
+plot(NULL,xlim=range(init_pop),ylim=c(0,0.65),ylab="Growth Rate (1/h)",xlab="Initial Population Size (No. of cells)",cex.lab=1.4,cex.main=1.2)
 for (i in 1:length(all_simpoprate)){
   points(rep(init_pop[i],iterations),all_simpoprate[[i]],col=adjustcolor("grey",0.7))
 }
