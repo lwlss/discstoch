@@ -25,10 +25,21 @@
 \section*{Abstract}
 
 \textbf{Chapter 1} 
-Fast-growing lineages dominate observed microbial population growth. However, when using growth rate as a measure of strain fitness inherent growth rate heterogeneities form a key at attributes of a strain's phenotype, in particular when considering populations where slow-growing sub-populations destine the evolutionary development of a population. Quantification of selective dominance of fast-growing strains at the single-lineage level of two published,  high-throughput microscopy assay \textit{Saccharomyces cerevisiae} data sets, \cite{Levy12,Ziv13}, has led to new mechanistic insight at the population level with discerning experimental design implications. The research presented below simulates the extent to which heterogeneity of single-lineage growth rates influences population behavior and demonstrates how an apparent lag phase can arise at the population level without being present at the single-lineage level.
+The rate at which microbial cells progress through the cell cycle is a major component of their evolutionary fitness.
+Measuring fitness phenotypes in a given environment or genetic background forms the basis of most quantitative assays of drug sensitivity or genetic interaction, for example, including genome-wide assays.
+Growth rate is typically measured in bulk cell populations, inoculated with anything from hundreds to millions of cells sampled from purified, isogneic colonies.
+High-throughput microscopy reveals that surprising levels of growth rate heterogeneity arise between isogenic cell lineages \cite{Levy12,Ziv13}.
+Here we examine the implications for interpreting bulk, population scale growth rate observations, given observed levels of growth rate heterogeneity.
+We demonstrate that selection between cell lineages with a range of growth rates can give rise to an apparent lag phase at the population level, even in the absence of evidence for any lag phase at the lineage level.
+Given observed levels of heterogeneity, we predict the effect of inoculum density on growth rate estimates and their reproducibility in bulk population \textit{S. cerevisiae} growth experiments.
 
 \textbf{Chapter 2}
-In order to validate and further explore the extent of the above conclusions, single-lineage microscopy data of \textit{S.cerevisiae} were generated using in-house micro Quantitative Fitness Analyses ($\mu$QFA) techniques. Complementary to the above analyzed data sets, the newly obtained $\mu$QFA data provided the added benefit of access to untrimmed raw data, including fast-growing outliers as well as non-dividing cells, all of which influence the extent of the lag phase at the population level. Given the immoderate effect with which growth rate heterogeneity at the single-lineage level estimated through modeling influences the behavior of a simulated population, various model options for parameter inference were explored. 
+In order to validate and further explore conclusions from Chapter 1, we carried out high-throughput microscopy experiments on Quantitative Fitness Analysis (QFA) \textit{S. cerevisiae} cultures.
+We call this approach ($\mu$QFA).
+We designed image analysis tools for $\mu$QFA to ensure that capture growth curves for fast-growing outlier lineages as well as for non-dividing cells.
+Fast-growing outliers in particular influence the extent of the lag phase at the population level.
+We explored various options for modelling growth curves and for carrying out parameter inference for models, including the full workflow in an open source R package.
+{SHOULD PROBABLY ONLY DISCUSS THE BEST COMBINATION OF MODEL AND INFERENCE WORKFLOW IN THE ABSTRACT?}
 
 \section{Isogenic growth rate heterogeneity and how population-level observations fail to capture it.}
 
@@ -39,7 +50,5 @@ In order to validate and further explore the extent of the above conclusions, si
 \bibitem[2]{Ziv13}Ziv,N., Siegal,M.L., Gresham,D. (2013) Genetic and nongenetic determinants of cell growth variation assessed by high-throughput microscopy. {\it Mol. Biol. Evol.}, {\bf 30}, 2568–2578. 
 
 \end{thebibliography}{}
-
-
 
 \end{document}
