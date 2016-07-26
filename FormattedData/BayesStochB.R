@@ -219,24 +219,24 @@ mcmc = function(p,tune,iters,thin,mLLik,th,pmin,pmax){
 dataset<-function(x){
   if (x == "Lawless"){
     # DataSet1: Lawless
-    area=fread("Lawless_area_shortTC.txt",header=FALSE)
-    times=fread("Lawless_time_shortTC.txt",header=FALSE)
-    data=fread("~Lawless_data_shortTC.txt",header=FALSE) #3rd column (Identifier) => strain_parentcolony
+    area=fread("~/BayesianInference/Lawless_area_shortTC.txt",header=FALSE)
+    times=fread("~/BayesianInference/Lawless_time_shortTC.txt",header=FALSE)
+    data=fread("~/BayesianInference/Lawless_data_shortTC.txt",header=FALSE) #3rd column (Identifier) => strain_parentcolony
     names(data)=c("genotype","clonalcolony","identifier","blobnumber")
     return(list("area"=area,"data"=data,"times"=times,"residuals"=residuals))
   }
   else if (x == "Levy"){
     # DataSet2: Levy
-    area=fread("Levy_area_filtered1.txt",header=FALSE)
-    times=fread("Levy_times_filtered1.txt",header=FALSE)
-    data=fread("Levy_data_filtered1.txt",header=TRUE) #3rd column (Identifier) => replicate
+    area=fread("~/BayesianInference/Levy_area_filtered1.txt",header=FALSE)
+    times=fread("~/BayesianInference/Levy_times_filtered1.txt",header=FALSE)
+    data=fread("~/BayesianInference/Levy_data_filtered1.txt",header=TRUE) #3rd column (Identifier) => replicate
     return(list("area"=area,"data"=data,"times"=times,"residuals"=residuals))
   }
   else if (x == "Ziv"){
     # DataSet3: Ziv
-    area=fread("Ziv_area_filtered1.txt",header=FALSE)
-    times=fread("Ziv_times_filtered1.txt",header=FALSE)
-    data=fread("Ziv_data_filtered1.txt",header=TRUE) #3rd column (Identifier) => colony
+    area=fread("~/BayesianInference/Ziv_area_filtered1.txt",header=FALSE)
+    times=fread("~/BayesianInference/Ziv_times_filtered1.txt",header=FALSE)
+    data=fread("~/BayesianInference/Ziv_data_filtered1.txt",header=TRUE) #3rd column (Identifier) => colony
     return(list("area"=area,"data"=data,"times"=times,"residuals"=residuals))
   }
   else {print("Not a valid dataset")}
@@ -312,7 +312,7 @@ print(date())
 # Compute and plot some basic summaries
 print(mcmcSummary(thmat,plot=FALSE))
 
-pdf(height = 8, width = 6,file = paste(datsetname,"_Bp_0106_Stoch_MCMC_Summary_GC",gc,"_Iters",iters,"_tune",tune,".pdf",sep=""))
+pdf(height = 8, width = 6,file = paste(datsetname,"_B0106_Stoch_MCMC_Summary_GC",gc,"_Iters",iters,"_tune",tune,".pdf",sep=""))
 #svg(paste("MCMC_Summary_GC",gc,".svg",sep=""),width=7, height=21,pointsize=24)
 mcmcSummary(thmat,show=FALSE,plot=TRUE)
 op=layout(matrix(c(1,1,2,3), 2, 2, byrow = TRUE))

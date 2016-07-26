@@ -13,14 +13,14 @@ if(length(input) < 1) {
 if("--help" %in% input) {
   cat("
       The R Script
-
+      
       Arguments:
       --arg1=someName              - name of the dataset
       --arg2=someValue             - which growth curves
       --arg3=someValue             - number of iterations 
       --arg4=someValue             - tuning parameter
       --help                       - prints this text
-
+      
       Example:
       ./test.R --arg1='Lawless' --arg2=101
       ")
@@ -43,12 +43,13 @@ library(smfsb)
 
 ####################################### Functions ########################################################
 
-detLog=function(K,r,c0,t){
-  return(K*c0*exp(r*t)/(K+c0*(exp(r*t)-1)))
+simExp<-function(r,t,N0=1){
+  N=N0*exp(r*t)
+  return(N)
 }
 
 # Hybrid model expressed as number of cells at time t1, after starting at t0
-simDt=function(K=1000,r=1,N0=1,NSwitch=100,t0=0,t1=1){
+simDt=function(r=1,N0=1,NSwitch=100,t0=0,t1=1){
   if(NSwitch>N0){
     # Unusually, for this model, we know the number of events a priori
     eventNo=NSwitch-N0
@@ -66,10 +67,10 @@ simDt=function(K=1000,r=1,N0=1,NSwitch=100,t0=0,t1=1){
       return(af(t1))	
     }else{
       # Deterministic simulation from tmax to t1
-      return(detLog(K,r,NSwitch,t1-tmax)) #use analytic solution to test 
+      return(simExp(r,NSwitch,t1-tmax)) #use analytic solution to test 
     }
   }else{
-    return(detLog(K,r,N0,t1-t0))
+    return(simExp(r,N0,t1-t0))
   }
 }
 
@@ -91,7 +92,7 @@ simCellsHybrid=function(K,r,N0,NSwitch,detpts=100){
     ats=c()
     tmax=0
   }
-    
+  
   # Switch to discrete deterministic logistic function
   clistdet=seq(NSwitch+(K-NSwitch)/detpts,K,(K-NSwitch)/detpts)
   tsdet=log((clistdet*(K - NSwitch))/((K - clistdet)*NSwitch))/r
@@ -148,8 +149,9 @@ mcmc = function(p,tune,iters,thin,mLLik,th,pmin,pmax){
   thmat=matrix(0,nrow=iters,ncol=p)
   colnames(thmat)=names(th)
   for (i in 1:iters) {
+    #print(i)
     #message(paste(i,""),appendLF=FALSE)
-    if (i%%(iters/10)==0) message(paste(i,date()))
+    if (i%%(iters/10)==0) message(paste(i,date(),"E"))
     for (j in 1:thin) {
       thprob=pmin-1
       while(sum((thprob<pmin)|(thprob>pmax))>0){
@@ -220,7 +222,7 @@ switchN=1
 noiseSD=10
 
 # Step Function for pfMLLik
-stepSim=function(x0=1, t0=0, deltat=1, th = c(3))  simDt(K=15000,th[1],x0,switchN,t0,t0+deltat) #fix K and change dimension of th 
+stepSim=function(x0=1, t0=0, deltat=1, th = c(3))  simDt(th[1],x0,switchN,t0,t0+deltat) 
 
 # Number of particles 
 n=10
@@ -243,7 +245,7 @@ print(date())
 # Compute and plot some basic summaries
 print(mcmcSummary(thmat,plot=FALSE))
 
-pdf(height = 8, width = 9,file = paste(datsetname,"_01_Stoch_MCMC_Summary_GC_",gc,"_Iters",iters,"_tune",tune,".pdf",sep=""))
+pdf(height = 8, width = 9,file = paste(datsetname,"_E01_Stoch_MCMC_Summary_GC_",gc,"_Iters",iters,"_tune",tune,".pdf",sep=""))
 mcmcSummary(thmat,show=FALSE,plot=TRUE)
 op=layout(matrix(c(1,1,2,3), 2, 2, byrow = TRUE))
 curve(dunif(x,pmin[1],pmax[1]),from=pmin[1],to=pmax[1],
