@@ -6,7 +6,7 @@ Contact: h.herrmann2@gmail.com
 
 #### General Usage 
 
-This package provides an image analysis tool for capturing QFA ([Addinall et al., 2011](http://journals.plos.org/plosgenetics/article?id=10.1371%2Fjournal.pgen.1001362)) cultures on a high-throughput level we call muQFA. Single lineage and pin population growth is catpured.
+This package provides an image analysis tool for capturing QFA ([Addinall et al., 2011](http://journals.plos.org/plosgenetics/article?id=10.1371%2Fjournal.pgen.1001362)) cultures on a high-throughput level we call muQFA. Single lineage and pin population growth is captured.
 
 The package consist of four modules:
 
@@ -20,7 +20,7 @@ The package consist of four modules:
 
 #### Example Code 
 
-All code I wrote for my MSc Dissertation analyses which makes use of this specific package is provied in the Analyses/ImageAnalysis/ folder on GitHub along with a sample input folder R09C08 which contains the corresponding tiff images of the microscopic observations for that pin. This data has not yet been integrated into the `muqfatc` package. 
+All code I wrote for my MSc Dissertation analyses which makes use of this specific package is provied in the Analyses/ImageAnalysis/ folder on GitHub along with a sample input folder R09C08 which contains the corresponding tiff images of the microscopic observations for that pin. This example data has not yet been integrated into the `muqfatc` package. 
 
 #### Dependencies
 
