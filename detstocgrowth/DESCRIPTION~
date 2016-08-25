@@ -3,9 +3,15 @@ Type: Package
 Title: Tools for Analysing Microbial Cell Growth
 Version: 0.1.0
 Author: Helena Herrmann
-Maintainer: h.herrmann2@gmail.com
-Description: Tools for analysing microbial cell growth at the single lineage 
-	level and the population level, including a standard log-linear model
-	of exponential growth, a Bayesian determnistic and logisitic model.  
+Maintainer: Helena Herrmann <h.herrmann2@gmail.com>
+Description: Tools for analysing microbial cell growth at the single lineage
+    level and the population level, including a standard log-linear model
+    of exponential growth, a Bayesian determnistic and logisitic model.
 License: What license is it under?
 LazyData: TRUE
+RoxygenNote: 5.0.1
+Suggests: knitr,
+    rmarkdown,
+    testthat
+VignetteBuilder: knitr
+Imports: segmented, bcp

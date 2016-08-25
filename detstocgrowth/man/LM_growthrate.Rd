@@ -7,9 +7,9 @@
 LM_growthrate(ai, ti)
 }
 \arguments{
-\item{ai}{- Area matrix where each row consists of one growth curve.}
+\item{ai}{- Area vector}
 
-\item{ti}{- Time matrix where each row corresponds to one growth curve.}
+\item{ti}{- Time vector}
 }
 \value{
 Estimated growth rate (\code{rate}) and
