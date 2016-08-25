@@ -16,4 +16,5 @@ Suggests: knitr,
 VignetteBuilder: knitr
 Imports: segmented,
     bcp,
-    rjags
+    rjags,
+    fishplot

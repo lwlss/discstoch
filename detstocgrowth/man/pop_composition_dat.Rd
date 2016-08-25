@@ -2,7 +2,7 @@
 % Please edit documentation in R/PopSimAnalyses.R
 \name{pop_composition_dat}
 \alias{pop_composition_dat}
-\title{FishPlots for Population Simulations}
+\title{Calculates Population Compositions as fed into the Fishplots using \code{pop_comoposition}}
 \usage{
 pop_composition_dat(t, iter, N0, strain_rates)
 }
@@ -20,6 +20,6 @@ The number of lineages which make up more than five percent and the percentage w
 the fastest lineage dominates the population are returned in a data frame.
 }
 \description{
-FishPlots for Population Simulations
+Calculates Population Compositions as fed into the Fishplots using \code{pop_comoposition}
 }
 

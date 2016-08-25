@@ -186,7 +186,7 @@ pop_comoposition<-function(r,t,gr){
                      vlab=c("1h",paste(max(t),"h",sep="")),border=0.01,cex.vlab=1.3)
 }
 
-#' FishPlots for Population Simulations
+#' Calculates Population Compositions as fed into the Fishplots using \code{pop_comoposition}
 #'
 #'@param t - Time sequence over which to simulate
 #'@param iter - Number of Iterations
