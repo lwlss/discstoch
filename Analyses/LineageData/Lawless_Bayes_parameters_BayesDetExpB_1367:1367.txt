@@ -1,0 +1,2 @@
+"Intercept" "Rate" "DividingCells"
+165.564741219572 0.261473497555284 1
