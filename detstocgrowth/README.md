@@ -25,7 +25,7 @@ Lineage compositions for population growth as well as the effect of inoculation 
 
 3. Bayesian deterministic modelling (`BayesDetMod`)
 
-Here one main function 'bayesdet` can be used to specify growth curves on which to do Bayesian parameter inference using `rjags`.
+Here one main function `bayesdet` can be used to specify growth curves on which to do Bayesian parameter inference using `rjags`.
 Various types of models including the logistic and exponential model with normal and log-normal error measurement can be specified for inference.
 
 4. Bayesian stochastic modelling (`BayesStochMod`): 
