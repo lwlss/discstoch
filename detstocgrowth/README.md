@@ -38,7 +38,7 @@ for early time points of single lineage observations.
 
 Example data is yet to be included in the package. However, a full workflow for all function in action can be found in the 
 Analysis/LineageData , Analyses/PopulationData and Analyses/SyntheticData folders on the Git Hub repository. 
-Sample data is provided in all folders. 
+Sample data is provided in all of these directories. 
 
 #### Dependencies
 
