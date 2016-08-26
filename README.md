@@ -1,10 +1,10 @@
 ___
 
-# Modeling the consequences of heterogeneity in *S. cerevisiae* population dynamics.  
+# Modeling the consequences of heterogeneity in *S. cerevisiae* population dynamics  
 
 ___
 
-The current project state includes two available packages written along with the MSc Dissertation and all soure code required to generate the results presented in the submitted Dissertation. 
+The current project state includes two available packages written along with the MSc Dissertation and all source code required to generate the results presented in the submitted Dissertation. 
 
 The python `muqfatc` package was written for analysing micro Quantiative Fitness Analysis images obtained by automated microscopy in order to obtain isogenic single lineage time course. 
 
@@ -32,11 +32,11 @@ muqfatc.lineagetimecourse(myfolders,FINALPHOT,bk,DX,DY,fullpath,apply_filt=True,
                        save_pics=True,log=False,show_im=False)
 ```
 
-- In order to be able to compare the population simulation done using single lineage data to true population simulations pin population growth can also be captured using `muqfatc`.
+- In order to be able to compare the population simulations done using single lineage data to true population observations pin population growth can also be captured using `muqfatc`.
 
 ```
 # Getting time and area for pin growth estimates for 90 observations
-area,time=pinia.pintimecourse(myfolders,90,fullpath)
+area,time=muqfatc.pintimecourse(myfolders,90,fullpath)
 ```
 
 ## 2) Parameter Inference of Single Lineage Growth Curves 
@@ -75,28 +75,28 @@ data=data[gc,]
 
 iterations=1000000
 thin=1000
-no_chains=4
+num_chains=4
 model_choice=2
-bayesinf=detstocgrowth::BayesDet(area,times,model_choice,iterations,thin,no_chains)
+bayesinf=detstocgrowth::BayesDet(area,times,model_choice,iterations,thin,num_chains)
 ```
 
 #### Logistic growth (Bayesian)
 
 ```
 model_choice=1
-bayesinf=detstochgrowth::BayesDet(area,times,model_choice,iterations,thin,no_chains)
+bayesinf=detstochgrowth::BayesDet(area,times,model_choice,iterations,thin,num_chains)
 ```
 
 #### Log-linear regression (Bayesian)
 
 ```
 model_choice=3
-bayesinf=detstochgrowth::BayesDet(area,times,model_choice,iterations,thin,no_chains)
+bayesinf=detstochgrowth::BayesDet(area,times,model_choice,iterations,thin,num_chains)
 ```
 
 #### Why the B?
-Both the exponential and the logistic model additional have a model specification with a B value. The B values sets a distinction between dividing and non-dividing growth curves such that N(t)=B*N0*exp(r*t) for the exponential model. B=1 means the lineage is growing / cells are dividing. B=0 means no growth. 
-This was used to test as a possible option for the stochastic model outlined below. 
+Both the exponential and the logistic model have a additional model specification with a B value. The B values sets a distinction between dividing and non-dividing growth curves such that N(t)=B*N0*exp(r*t) for the exponential model. B=1 means the lineage is growing / cells are dividing. B=0 means no growth. 
+This was used to test as a possible option for the stochastic model. (Not discussed in the Dissertation). 
 
 A Bayesian stochastic/deterministic hybrid model was also tested for parameter inference. NB: the current implementation is not suitable for a high-throughput level but can be used on individual growth curves which contain some noise and are relatively fast-growing. 
 
@@ -151,10 +151,10 @@ gr=seq(0,0.5,0.001)
 simpopdat=detstocgrowth::pop_sim_plot(strain,strain_rates,gr,yl,iterations,t)
 ```
 
-Additional features which can be used to analyse the population simulations include
+Additional features which can be used to analyse the population simulations include:
 
 ```
-# Generating a colour map according to which population simulations are coloured
+# Generating a colour map which is used to color population simulations
 detstochgrowth::yellowredmap(gr)
 
 # Producing fishplots
@@ -184,7 +184,7 @@ iterations=100
 strainlag=detstocgrowth::lagduration(strain=0,strain_rates,t,N,iterations)
 ```
 
-which assess lag duration with increasing inoculation size, growth rate with increasing inoculation sizes and single lineage percentile composition of population over time. 
+which assess lag duration with increasing inoculation size, lineage growth increasing inoculation sizes and single lineage percentile composition of population over time. 
 
 ## 4) Comparing Population Simulations to Population Observations
 
