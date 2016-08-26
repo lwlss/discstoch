@@ -4,7 +4,7 @@ Link: https://github.com/lwlss/discstoch
 
 Contact: h.herrmann2@gmail.com 
 
-This R package provides tools for analyzing single lineage microbial growth curves and was written for analyzing single 
+This R package provides tools for analysing single lineage microbial growth curves and was written for analysing single 
 lineage data provided by [Levy et al. 2012](http://journals.plos.org/plosbiology/article?id=10.1371%2Fjournal.pbio.1001325) 
 as well as muQFA data. 
 
