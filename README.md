@@ -161,7 +161,7 @@ detstochgrowth::yellowredmap(gr)
 N=10000
 sample_rates=sample(strain_rates,N,replace=TRUE)
 time=seq(1,48)
-pop_comoposition(sample_rates,time,gr)
+detstochgrowth::pop_comoposition(sample_rates,time,gr)
 
 # Calculating percentile lineage contributions
 t=seq(1,48,1)
@@ -169,7 +169,7 @@ iter=1000
 StartPops=c(50,100,500,1000,5000,10000)
 #StartPops=c(50,100,500)
 for (N in StartPops){
-  newinfo=pop_composition_dat(t,iter,N,strain_rates)
+  newinfo=detstochgrowth::pop_composition_dat(t,iter,N,strain_rates)
   if (N==StartPops[1]){
     info=newinfo
   } else{
@@ -181,7 +181,7 @@ for (N in StartPops){
 N=seq(100,10000,100)
 time=seq(0,48,1)
 iterations=100
-strainlag=lagduration(strain=0,strain_rates,t,N,iterations)
+strainlag=detstocgrowth::lagduration(strain=0,strain_rates,t,N,iterations)
 ```
 
 which assess lag duration with increasing inoculation size, growth rate with increasing inoculation sizes and single lineage percentile composition of population over time. 
