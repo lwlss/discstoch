@@ -1,6 +1,6 @@
 ___
 
-# MSc Submission: Modeling the consequences of heterogeneity in *S. cerevisiae* population dynamics.  
+# Modeling the consequences of heterogeneity in *S. cerevisiae* population dynamics.  
 
 ___
 
