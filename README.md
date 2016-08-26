@@ -12,7 +12,7 @@ The `detstochgrowth` package was written for subsequent time course analyses. Pr
 
 # Work Flow 
 
-## Image Analysis
+## 1) Image Analysis
 
 - Time course observations are saved as tiff images and are sorted into folders labeled by pin numbers (RxxCzz) specifying the rows and columns from the top left-hand corner of an agar plate on which yeast cells were grown.
 - The image analysis tool `muqfatc` iterates through the pin directories analyzing single lineages observed in each time course. 
@@ -39,11 +39,11 @@ muqfatc.lineagetimecourse(myfolders,FINALPHOT,bk,DX,DY,fullpath,apply_filt=True,
 area,time=pinia.pintimecourse(myfolders,90,fullpath)
 ```
 
-## Parameter Inference of Single Lineage Growth Curves 
+## 2) Parameter Inference of Single Lineage Growth Curves 
 
 Two frequentist, deterministic approaches are implemented. 
 
-#### Log-linear regression
+#### Log-linear regression (Frequentist)
 
 ```
 rates=c()
@@ -53,7 +53,7 @@ for (i in 1:dim(area)[1]){
 }
 ```
 
-#### Exponential growth on the original scale 
+#### Exponential growth on the original scale (Frequentist)
 
 ```
 rates=c()
@@ -63,9 +63,9 @@ for (i in 1:dim(area)[1]){
 }
 ```
 
-A bayesian approach using `rjags` with various model specifications is available.
+A bayesian approach using `rjags` with various model specifications is available. A few examples are shown below.
 
-#### Exponential growth
+#### Exponential growth (Bayesian)
 
 ```
 gc=250:255 # Inference for growth curves 250:255
@@ -80,14 +80,14 @@ model_choice=2
 bayesinf=detstocgrowth::BayesDet(area,times,model_choice,iterations,thin,no_chains)
 ```
 
-#### Logistic growth 
+#### Logistic growth (Bayesian)
 
 ```
 model_choice=1
 bayesinf=detstochgrowth::BayesDet(area,times,model_choice,iterations,thin,no_chains)
 ```
 
-#### Log-linear regression 
+#### Log-linear regression (Bayesian)
 
 ```
 model_choice=3
@@ -100,7 +100,7 @@ This was used to test as a possible option for the stochastic model outlined bel
 
 A Bayesian stochastic/deterministic hybrid model was also tested for parameter inference. NB: the current implementation is not suitable for a high-throughput level but can be used on individual growth curves which contain some noise and are relatively fast-growing. 
 
-#### Discrete, stochastic birth-only growth 
+#### Discrete, stochastic birth-only growth (Bayesian)
 
 ```
 # Apply calibration and format data 
@@ -132,7 +132,7 @@ detstochgrowth::PlotPosteriorProb(pmin,pmax,mcmc_chain)
 detstocgrowth::PlotPosteriorPredictive(data,mcmc_chain,switchN,guessK)
 ```
 
-## Population Simulations 
+## 3) Population Simulations 
 
 Population growth is simulated from single lineage data associated with a strain as follows:
 
@@ -151,7 +151,7 @@ gr=seq(0,0.5,0.001)
 simpopdat=detstocgrowth::pop_sim_plot(strain,strain_rates,gr,yl,iterations,t)
 ```
 
-Additional features which can be used to analyse the population simulations include the 
+Additional features which can be used to analyse the population simulations include
 
 ```
 # Generating a colour map according to which population simulations are coloured
@@ -186,9 +186,9 @@ strainlag=lagduration(strain=0,strain_rates,t,N,iterations)
 
 which assess lag duration with increasing inoculation size, growth rate with increasing inoculation sizes and single lineage percentile composition of population over time. 
 
-```
-## Comparing Population Simulations to Population Observations
+## 4) Comparing Population Simulations to Population Observations
 
+```
 # Plotting the Pin Population Estimates
 PinDat=detstochgrowth::pin_pop_plot(strain,strainarea,sraintimes)
 
@@ -199,9 +199,9 @@ it=100 #Number of simulations
 Comp=detstocgrowth::PlotPinObsSim(area,times,sortedfolders,obs,conv,it,leg=FALSE)
 ```
 
-## Image Analysis
+## 5) Image Analysis
 
-- There is an additional feature in the `muqfatc` package which colour-codes the colonies on the plate according the growth rate and residual size. Code for this is included here but is not addressed in the Dissertation. No significant patters were found. 
+- There is an additional feature in the `muqfatc` package which colour-codes the colonies on the plate according the growth rate and residual size. Code for this is included in the Analyses/ImageAnalysis directory but is not addressed in the Dissertation. No significant patters were found. 
 
 ____
 
