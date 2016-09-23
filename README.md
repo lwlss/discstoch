@@ -7,6 +7,7 @@ ___
 The current project state includes two available packages written along with the MSc Dissertation and all source code required to generate the results presented in the submitted Dissertation. 
 
 The python `muqfatc` package was written for analysing micro Quantiative Fitness Analysis images obtained by automated microscopy in order to obtain isogenic single lineage time course. 
+This package is now on PyPI and can be installed using `pip install muqfatc`. 
 
 The `detstochgrowth` package was written for subsequent time course analyses. Provided functions are for generating single lineage growth curves, generating population inferences from single lineage data and more. This package was used to analyze both the in-house muQFA data and the published data kindly provided to us by [Levy et al. 2012] (http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3348152/). Synthetic data was also analyzed for exploratory purposes. These data are included in the Analyses/Synthetic directory. 
 
