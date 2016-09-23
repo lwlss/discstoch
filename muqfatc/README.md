@@ -1,8 +1,10 @@
 ## Python package `muqfatc` version 0.1
 
-Link: https://github.com/lwlss/discstoch
+Link: https://github.com/lwlss/discstoch ; https://pypi.python.org/pypi/muqfatc/0.1
 
 Contact: h.herrmann2@gmail.com
+
+This package is now on PyPI and can be downloaded using `pip install muqfatc`.
 
 #### General Usage 
 
