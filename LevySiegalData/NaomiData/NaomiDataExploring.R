@@ -15,7 +15,6 @@ setwd('..')
 setwd('./NZ_130722_1_GR')
 load('d.Rfile')
 
-strain_imno = c()
 for (i in names(labhaploid)){
   id = which(i == names(d$well.list))
   strain_imno = c(strain_imno,d$well.list[[id]])
